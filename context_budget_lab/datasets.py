@@ -9,8 +9,8 @@ from typing import Any, Mapping
 
 DATASET_DIR = Path(__file__).resolve().parents[1] / "datasets"
 DATASET_FILES: Mapping[str, str] = {
-    "public_ai_policy_toy": "public_ai_policy_toy.jsonl",
-    "synthetic_agent_memory_toy": "synthetic_agent_memory_toy.jsonl",
+    "public_ai_policy_v0": "public_ai_policy_v0.jsonl",
+    "synthetic_agent_memory_v0": "synthetic_agent_memory_v0.jsonl",
 }
 
 _REQUIRED_TASK_FIELDS = {
@@ -21,9 +21,14 @@ _REQUIRED_TASK_FIELDS = {
     "context",
     "expected_answer",
     "expected_citations",
+    "expected_facts",
+    "answer_schema",
     "metadata",
 }
 _REQUIRED_CONTEXT_FIELDS = {"document_id", "title", "text", "source_url"}
+_TASK_TYPES = {"citation_qa", "memory_qa", "structured_extraction"}
+_DIFFICULTIES = {"toy", "easy", "medium", "hard"}
+_ANSWER_SCHEMAS = {"answer_with_citations"}
 _KEYWORD_STOPWORDS = {
     "about",
     "against",
@@ -71,6 +76,8 @@ class BenchmarkTask:
     context: tuple[ContextDocument, ...]
     expected_answer: str
     expected_citations: tuple[str, ...]
+    expected_facts: tuple[str, ...]
+    answer_schema: str
     metadata: Mapping[str, Any]
 
 
@@ -95,7 +102,8 @@ def task_to_strategy_input(task: BenchmarkTask) -> dict[str, Any]:
         "sources": sources,
         "summary": _summary_memory(task),
         "structured_facts": _structured_facts(task),
-        "gold_answer_keywords": _gold_keywords(task.expected_answer),
+        "gold_answer_keywords": list(task.expected_facts),
+        "answer_schema": task.answer_schema,
         "gold_source_ids": list(task.expected_citations),
         "expected_answer": task.expected_answer,
         "metadata": dict(task.metadata),
@@ -168,10 +176,32 @@ def validate_task_object(
             f"expected {expected_dataset_id!r}"
         )
 
+    task_type = _require_str(raw, "task_type")
+    if task_type not in _TASK_TYPES:
+        raise DatasetValidationError(
+            f"Task {task_id!r} field 'task_type' must be one of: "
+            f"{', '.join(sorted(_TASK_TYPES))}"
+        )
+
     context = _validate_context(raw["context"], task_id=task_id)
     citation_ids = _validate_str_list(
         raw["expected_citations"], field="expected_citations", task_id=task_id
     )
+    expected_facts = _validate_str_list(
+        raw["expected_facts"], field="expected_facts", task_id=task_id
+    )
+    if not expected_facts:
+        raise DatasetValidationError(
+            f"Task {task_id!r} field 'expected_facts' must not be empty"
+        )
+
+    answer_schema = _require_str(raw, "answer_schema")
+    if answer_schema not in _ANSWER_SCHEMAS:
+        raise DatasetValidationError(
+            f"Task {task_id!r} field 'answer_schema' must be one of: "
+            f"{', '.join(sorted(_ANSWER_SCHEMAS))}"
+        )
+
     context_ids = {document.document_id for document in context}
     missing_citations = sorted(set(citation_ids).difference(context_ids))
     if missing_citations:
@@ -199,14 +229,43 @@ def validate_task_object(
             "'public' or 'synthetic'"
         )
 
+    difficulty = metadata.get("difficulty")
+    if difficulty not in _DIFFICULTIES:
+        raise DatasetValidationError(
+            f"Task {task_id!r} field 'metadata.difficulty' must be one of: "
+            f"{', '.join(sorted(_DIFFICULTIES))}"
+        )
+
+    _validate_str_list(metadata.get("tags"), field="metadata.tags", task_id=task_id)
+
+    distractor_ids = _validate_str_list(
+        metadata.get("distractor_document_ids", []),
+        field="metadata.distractor_document_ids",
+        task_id=task_id,
+    )
+    unknown_distractors = sorted(set(distractor_ids).difference(context_ids))
+    if unknown_distractors:
+        raise DatasetValidationError(
+            f"Task {task_id!r} marks distractor document id(s) not present in context: "
+            f"{', '.join(unknown_distractors)}"
+        )
+    cited_distractors = sorted(set(distractor_ids).intersection(citation_ids))
+    if cited_distractors:
+        raise DatasetValidationError(
+            f"Task {task_id!r} marks expected citation id(s) as distractors: "
+            f"{', '.join(cited_distractors)}"
+        )
+
     return BenchmarkTask(
         task_id=task_id,
         dataset_id=dataset_id,
-        task_type=_require_str(raw, "task_type"),
+        task_type=task_type,
         query=_require_str(raw, "query"),
         context=context,
         expected_answer=_require_str(raw, "expected_answer"),
         expected_citations=tuple(citation_ids),
+        expected_facts=tuple(expected_facts),
+        answer_schema=answer_schema,
         metadata=dict(metadata),
     )
 

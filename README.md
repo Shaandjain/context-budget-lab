@@ -1,10 +1,12 @@
 # context-budget-lab
 
-Flagship. Benchmark suite answering: when should an agent use full context, retrieval, structured memory, summary memory, or prefix-cache-friendly prompting?
+Benchmark suite answering: when should an agent use full context, retrieval, structured memory, summary memory, or prefix-cache-friendly prompting?
 
 **Research question:** For agentic and RAG workloads, what context strategy gives the best quality/latency/cost frontier?
 
-**Status:** in progress. The first runnable slice is live: tiny public-policy and synthetic-agent-memory datasets, five baseline context strategies, shared JSONL traces, summary output, and a real local Ollama smoke run.
+**Second job (added 2026-06-11):** every task here doubles as a release-gate workload for `../inference-release-lab`. Task records must stay importable as gate suites: each carries `task_id`, `dataset_id`, expected source/citation IDs, expected facts, an output schema name, difficulty, and tags. Window compressed to weeks 3–5 (see `../ROADMAP.md`); v0 = 40 real tasks, deterministic judging, repeated runs with variance, one frontier chart.
+
+**Status:** in progress. The first runnable slice is live: v0 public-policy and synthetic-agent-memory datasets, five baseline context strategies, shared JSONL traces, summary output, and a real local Ollama smoke run.
 
 Measures answer + citation accuracy alongside TTFT, TPOT/TBT, p50/p95, throughput, context tokens, cache hit rate, and cost per 1K useful answers. Datasets: public legal/policy docs, agent task logs, synthetic geo-audio transcripts (all public or synthetic, labeled).
 
@@ -50,4 +52,4 @@ Committed local run:
 - `results/local-smoke/context-budget-20260612-004000/summary.json`
 - `results/local-smoke/context-budget-20260612-004000/latency_quality.svg`
 
-This run used Ollama's OpenAI-compatible endpoint on the M3 Pro with `qwen2.5:3b`, two toy tasks, five strategies, and zero request errors. It is a harness/reproducibility check, not a research claim.
+This run used Ollama's OpenAI-compatible endpoint on the M3 Pro with `qwen2.5:3b`, two toy tasks, five strategies, and zero request errors. It is a historical harness/reproducibility check, not a research claim.

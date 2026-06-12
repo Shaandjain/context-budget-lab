@@ -20,7 +20,7 @@ from context_budget_lab.strategies import build_strategy_prompt, list_strategy_n
 from context_budget_lab.traces import SCHEMA_VERSION, TraceRecord, make_run_id, validate_record, write_jsonl_record, write_run_sidecar
 
 
-DEFAULT_DATASETS = ["public_ai_policy_toy", "synthetic_agent_memory_toy"]
+DEFAULT_DATASETS = ["public_ai_policy_v0", "synthetic_agent_memory_v0"]
 DEFAULT_STRATEGIES = ["full_context", "rag_topk", "summary_memory", "structured_memory", "prefix_cache_friendly"]
 
 

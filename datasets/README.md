@@ -1,8 +1,9 @@
 # Dataset Slice
 
-Tiny JSONL datasets for the first context-budget benchmark loop. These are not
-claim-making evaluation sets; they are smoke-test fixtures for loader,
-prompting, trace emission, and scoring integration.
+JSONL datasets for the context-budget benchmark loop. The v0 suites are still
+small, but they are no longer toy smoke fixtures: they exercise citation QA and
+synthetic memory recall with explicit distractors, expected facts, and output
+schema names.
 
 ## Schema
 
@@ -11,7 +12,7 @@ Each line is one task object:
 ```json
 {
   "task_id": "stable-task-id",
-  "dataset_id": "public_ai_policy_toy",
+  "dataset_id": "public_ai_policy_v0",
   "task_type": "citation_qa",
   "query": "Question shown to the model.",
   "context": [
@@ -24,11 +25,14 @@ Each line is one task object:
   ],
   "expected_answer": "Short reference answer.",
   "expected_citations": ["stable-document-id"],
+  "expected_facts": ["literal substring"],
+  "answer_schema": "answer_with_citations",
   "metadata": {
     "source_type": "public",
     "source_urls": ["https://public-source.example/path"],
-    "benchmark_focus": ["citation_accuracy"],
-    "difficulty": "toy"
+    "difficulty": "medium",
+    "tags": ["citation_accuracy"],
+    "distractor_document_ids": ["nearby-but-wrong-document-id"]
   }
 }
 ```
@@ -37,12 +41,13 @@ Required fields are validated by `context_budget_lab.datasets`.
 
 ## Datasets
 
-- `public_ai_policy_toy.jsonl`: public AI policy snippets from government or
-  official public sources. Use this to exercise citation selection across
-  similar policy/governance passages.
-- `synthetic_agent_memory_toy.jsonl`: synthetic agent-memory tasks inspired by
-  public agent/retrieval papers. Use this to test memory compression and
-  preference/state recall without private data.
+- `public_ai_policy_v0.jsonl`: 20 self-written public AI policy tasks using
+  government, OECD, and model-card sources. Use this to exercise citation
+  selection across similar policy/governance passages.
+- `synthetic_agent_memory_v0.jsonl`: 20 synthetic agent-memory tasks inspired by
+  public agent/retrieval papers. Use this to test preference recall, state
+  recall, conflict resolution, and explicit "memory does not contain this"
+  abstention without private data.
 
 ## Source Rules
 
