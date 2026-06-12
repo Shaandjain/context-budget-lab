@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from benchmarks.run_context_benchmark import main
+from benchmarks.run_matrix import main as run_matrix
 from context_budget_lab.metrics import summarize_records
 
 
@@ -31,3 +32,62 @@ def test_cli_mock_smoke_writes_shared_trace(tmp_path: Path) -> None:
     assert "avg_citation_precision" in summary[0]
     assert "avg_citation_recall" in summary[0]
     assert "avg_schema_ok" in summary[0]
+
+
+def test_cli_repeats_record_seed_in_run_and_trace(tmp_path: Path) -> None:
+    assert (
+        main(
+            [
+                "--mock",
+                "--limit",
+                "1",
+                "--strategies",
+                "full_context",
+                "--repeats",
+                "2",
+                "--seed",
+                "42",
+                "--out",
+                str(tmp_path),
+            ]
+        )
+        == 0
+    )
+
+    run_dir = next(tmp_path.iterdir())
+    run = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
+    lines = (run_dir / "traces.jsonl").read_text(encoding="utf-8").strip().splitlines()
+
+    assert run["config"]["repeats"] == 2
+    assert run["config"]["seed"] == 42
+    assert run["n_requests"] == 4
+    assert len(lines) == 4
+    first = json.loads(lines[0])
+    assert first["meta"]["repeat_index"] == 0
+    assert first["meta"]["seed"] == 42
+    assert ":r0:" in first["request_id"]
+
+
+def test_run_matrix_writes_condition_summary_and_plot(tmp_path: Path) -> None:
+    assert (
+        run_matrix(
+            [
+                "--mock",
+                "--limit",
+                "1",
+                "--strategies",
+                "full_context",
+                "--repeats",
+                "1",
+                "--out",
+                str(tmp_path),
+            ]
+        )
+        == 0
+    )
+
+    run_dirs = list((tmp_path / "simulated" / "full_context").iterdir())
+    assert len(run_dirs) == 1
+    run_dir = run_dirs[0]
+    assert (run_dir / "summary.json").exists()
+    assert (run_dir / "latency_quality.svg").exists()

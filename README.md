@@ -35,6 +35,17 @@ For CI or no-server checks:
 uv run python benchmarks/run_context_benchmark.py --mock --limit 1 --out results/mock-smoke
 ```
 
+Run one directory per strategy condition with five repeats:
+
+```bash
+uv run python benchmarks/run_matrix.py \
+  --base-url http://localhost:11434/v1 \
+  --models qwen2.5:3b \
+  --repeats 5 \
+  --seed 1729 \
+  --out results/local-matrix
+```
+
 ## Baselines
 
 - `full_context`: send every task-local source.

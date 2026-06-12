@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="360" viewBox="0 0 920 360">
+<rect width="100%" height="100%" fill="#fafafa"/>
+<text x="24" y="36" font-family="Arial, sans-serif" font-size="20" font-weight="700">Context Strategy Smoke: Latency and Quality</text>
+<text x="24" y="62" font-family="Arial, sans-serif" font-size="13" fill="#555">Bars show average latency; labels show answer/citation/evidence quality.</text>
+<text x="24" y="116" font-family="Arial, sans-serif" font-size="13">full_context</text>
+<rect x="180" y="96" width="560" height="28" fill="#2563eb"/>
+<text x="750" y="115" font-family="Arial, sans-serif" font-size="12" fill="#222">2.479s  F:0.785 P:0.619 R:0.847 E:1.0</text>
+</svg>

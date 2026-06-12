@@ -34,8 +34,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--max-tokens", type=int, default=180)
     parser.add_argument("--temperature", type=float, default=0.0)
+    parser.add_argument("--repeats", type=int, default=1)
+    parser.add_argument("--seed", type=int, default=1729)
     parser.add_argument("--mock", action="store_true", help="Use deterministic in-process completions.")
     args = parser.parse_args(argv)
+    if args.repeats < 1:
+        raise SystemExit("--repeats must be >= 1")
 
     dataset_ids = _split_csv(args.datasets)
     strategy_names = _split_csv(args.strategies)
@@ -57,73 +61,77 @@ def main(argv: list[str] | None = None) -> int:
         if args.limit is not None:
             tasks = tasks[: args.limit]
         for task in tasks:
-            for strategy_name in strategy_names:
-                request_id = f"{dataset_id}:{task['task_id']}:{strategy_name}"
-                ts_arrival_s = time.perf_counter() - start
-                strategy_result = build_strategy_prompt(task, strategy_name)
-                messages = _messages_from_prompt(strategy_result["prompt"])
-                selected_source_ids = strategy_result.get("source_ids", [])
-                strategy_meta = strategy_result.get("metadata", {})
-                error: str | None = None
-                answer = ""
-                try:
-                    completion = client.complete(
-                        messages,
-                        max_tokens=args.max_tokens,
-                        temperature=args.temperature,
-                    )
-                    answer = completion.text
-                except Exception as exc:  # traces record failed requests too
-                    completion = _failed_completion(messages, time.perf_counter() - start - ts_arrival_s)
-                    error = str(exc)
+            for repeat_index in range(args.repeats):
+                for strategy_name in strategy_names:
+                    request_id = f"{dataset_id}:{task['task_id']}:r{repeat_index}:{strategy_name}"
+                    ts_arrival_s = time.perf_counter() - start
+                    strategy_result = build_strategy_prompt(task, strategy_name)
+                    prompt = _with_nonce(strategy_result["prompt"], seed=args.seed, repeat_index=repeat_index, request_id=request_id)
+                    messages = _messages_from_prompt(prompt)
+                    selected_source_ids = strategy_result.get("source_ids", [])
+                    strategy_meta = strategy_result.get("metadata", {})
+                    error: str | None = None
+                    answer = ""
+                    try:
+                        completion = client.complete(
+                            messages,
+                            max_tokens=args.max_tokens,
+                            temperature=args.temperature,
+                        )
+                        answer = completion.text
+                    except Exception as exc:  # traces record failed requests too
+                        completion = _failed_completion(messages, time.perf_counter() - start - ts_arrival_s)
+                        error = str(exc)
 
-                score = score_answer(task, strategy_result, answer)
-                scores = score["scores"]
-                meta: dict[str, Any] = {
-                    "dataset_id": dataset_id,
-                    "task_id": task["task_id"],
-                    "question": task["question"],
-                    "retrieved_source_ids": selected_source_ids,
-                    "gold_source_ids": task.get("gold_source_ids", []),
-                    "fact_coverage": scores["fact_coverage"],
-                    "citation_precision": scores["citation_precision"],
-                    "citation_recall": scores["citation_recall"],
-                    "evidence_recall": scores["evidence_recall"],
-                    "schema_ok": scores["schema_ok"],
-                    "abstain_correct": scores["abstain_correct"],
-                    "prefix_cacheable_tokens": _prefix_cacheable_tokens(strategy_name, strategy_result["prompt"]),
-                    "strategy_build_cost_usd": 0.0,
-                    "strategy_metadata": strategy_meta,
-                    "matched_expected_facts": score["matched_expected_facts"],
-                    "cited_source_ids": score["cited_source_ids"],
-                    "unknown_citation_ids": score["unknown_citation_ids"],
-                    "schema_errors": score["schema_errors"],
-                    "abstained": score["abstained"],
-                    "abstain_expected": score["abstain_expected"],
-                    "answer_excerpt": answer[:400],
-                }
-                record = TraceRecord(
-                    schema_version=SCHEMA_VERSION,
-                    run_id=run_id,
-                    source=source,
-                    request_id=request_id,
-                    ts_arrival_s=round(ts_arrival_s, 6),
-                    strategy=strategy_name,
-                    model=args.model if not args.mock else "simulated",
-                    endpoint=endpoint,
-                    input_tokens=completion.input_tokens if completion.input_tokens is not None else estimate_tokens(_messages_text(messages)),
-                    output_tokens=completion.output_tokens if completion.output_tokens is not None else estimate_tokens(answer),
-                    queue_wait_s=None,
-                    ttft_s=round(completion.ttft_s, 6),
-                    tpot_s=round(completion.tpot_s, 6) if completion.tpot_s is not None else None,
-                    latency_s=round(completion.latency_s, 6),
-                    error=error,
-                    cost_usd=None,
-                    meta=meta,
-                )
-                validate_record(record)
-                write_jsonl_record(traces_path, record)
-                n_requests += 1
+                    score = score_answer(task, strategy_result, answer)
+                    scores = score["scores"]
+                    meta: dict[str, Any] = {
+                        "dataset_id": dataset_id,
+                        "task_id": task["task_id"],
+                        "repeat_index": repeat_index,
+                        "seed": args.seed,
+                        "question": task["question"],
+                        "retrieved_source_ids": selected_source_ids,
+                        "gold_source_ids": task.get("gold_source_ids", []),
+                        "fact_coverage": scores["fact_coverage"],
+                        "citation_precision": scores["citation_precision"],
+                        "citation_recall": scores["citation_recall"],
+                        "evidence_recall": scores["evidence_recall"],
+                        "schema_ok": scores["schema_ok"],
+                        "abstain_correct": scores["abstain_correct"],
+                        "prefix_cacheable_tokens": _prefix_cacheable_tokens(strategy_name, strategy_result["prompt"]),
+                        "strategy_build_cost_usd": 0.0,
+                        "strategy_metadata": strategy_meta,
+                        "matched_expected_facts": score["matched_expected_facts"],
+                        "cited_source_ids": score["cited_source_ids"],
+                        "unknown_citation_ids": score["unknown_citation_ids"],
+                        "schema_errors": score["schema_errors"],
+                        "abstained": score["abstained"],
+                        "abstain_expected": score["abstain_expected"],
+                        "answer_excerpt": answer[:400],
+                    }
+                    record = TraceRecord(
+                        schema_version=SCHEMA_VERSION,
+                        run_id=run_id,
+                        source=source,
+                        request_id=request_id,
+                        ts_arrival_s=round(ts_arrival_s, 6),
+                        strategy=strategy_name,
+                        model=args.model if not args.mock else "simulated",
+                        endpoint=endpoint,
+                        input_tokens=completion.input_tokens if completion.input_tokens is not None else estimate_tokens(_messages_text(messages)),
+                        output_tokens=completion.output_tokens if completion.output_tokens is not None else estimate_tokens(answer),
+                        queue_wait_s=None,
+                        ttft_s=round(completion.ttft_s, 6),
+                        tpot_s=round(completion.tpot_s, 6) if completion.tpot_s is not None else None,
+                        latency_s=round(completion.latency_s, 6),
+                        error=error,
+                        cost_usd=None,
+                        meta=meta,
+                    )
+                    validate_record(record)
+                    write_jsonl_record(traces_path, record)
+                    n_requests += 1
 
     write_run_sidecar(
         run_dir,
@@ -138,6 +146,8 @@ def main(argv: list[str] | None = None) -> int:
             "base_url": args.base_url,
             "max_tokens": args.max_tokens,
             "temperature": args.temperature,
+            "repeats": args.repeats,
+            "seed": args.seed,
             "mock": args.mock,
         },
         environment={"machine": "m3-pro-local", "notes": "local-first Project 2 smoke"},
@@ -165,6 +175,10 @@ def _messages_text(messages: list[dict[str, str]]) -> str:
 
 def _messages_from_prompt(prompt: str) -> list[dict[str, str]]:
     return [{"role": "user", "content": prompt}]
+
+
+def _with_nonce(prompt: str, *, seed: int, repeat_index: int, request_id: str) -> str:
+    return f"Run nonce: seed={seed}; repeat={repeat_index}; request={request_id}\n\n{prompt}"
 
 
 def _prefix_cacheable_tokens(strategy_name: str, prompt: str) -> int:
