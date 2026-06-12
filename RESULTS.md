@@ -4,6 +4,7 @@ Reproduce the v1 analysis from committed traces:
 
 ```bash
 uv run python analysis/frontier.py results/local-matrix --out-dir analysis/frontier --resamples 1000 --seed 1729
+uv run python analysis/paired_deltas.py results/local-matrix --out-dir analysis/paired_deltas --resamples 1000 --seed 1729
 uv run python analysis/abstention_variant.py --baseline-root results/local-matrix --variant-root results/abstention-variant --out-dir analysis/abstention_variant --dataset-id synthetic_agent_memory_v0 --models qwen2.5:3b,qwen2.5:7b
 uv run python benchmarks/export_workloads.py
 uv run pytest
@@ -26,6 +27,24 @@ The 7b model did not broadly dominate the 3b model on fact coverage at this N. T
 The 7b model did improve several citation and schema measures on context-heavy strategies. From `analysis/frontier/model_deltas.md`, citation recall moved +0.129 for full context, +0.059 for RAG top-k, and +0.200 for prefix-cache-friendly; schema compliance moved +0.135 for full context, +0.070 for RAG top-k, and +0.165 for prefix-cache-friendly. Memory strategies did not get the same clean lift: summary memory schema moved -0.190 and structured memory schema moved -0.175.
 
 The latency cost of scale is clear in the same delta table. 7b p50 end-to-end latency moved +3.083s for full context, +1.463s for RAG top-k, +3.112s for prefix-cache-friendly, +3.567s for structured memory, and +2.441s for summary memory.
+
+## A11 Paired Reanalysis
+
+The v1 frontier used per-arm bootstrap CIs, but the design is paired: the same tasks appear under every strategy and model. A11 reanalyzes the committed v1 traces by first averaging repeats per task, then bootstrapping over task-level deltas. No new model runs are included. Outputs live in `analysis/paired_deltas/summary.md`.
+
+| comparison | metric | paired delta | A11 interpretation | source |
+| --- | --- | --- | --- | --- |
+| 3b `full_context` -> 3b `rag_topk` | fact coverage | -0.018 [-0.086, 0.040] | still indistinguishable | `analysis/paired_deltas/summary.md` |
+| 7b `full_context` -> 7b `rag_topk` | fact coverage | +0.002 [-0.045, 0.053] | still indistinguishable | `analysis/paired_deltas/summary.md` |
+| 3b `full_context` -> 3b `summary_memory` | fact coverage | -0.148 [-0.246, -0.053] | compression loss separates under pairing | `analysis/paired_deltas/summary.md` |
+| 7b `rag_topk` -> 7b `summary_memory` | fact coverage | -0.132 [-0.227, -0.037] | compression loss separates under pairing | `analysis/paired_deltas/summary.md` |
+| 7b `rag_topk` -> 7b `structured_memory` | fact coverage | -0.134 [-0.217, -0.047] | compression loss separates under pairing | `analysis/paired_deltas/summary.md` |
+| 3b `full_context` -> 7b `full_context` | fact coverage | -0.060 [-0.131, 0.001] | 7b fact deficit still does not cleanly separate | `analysis/paired_deltas/summary.md` |
+| 3b `rag_topk` -> 7b `rag_topk` | fact coverage | -0.040 [-0.100, 0.018] | 7b fact deficit still does not cleanly separate | `analysis/paired_deltas/summary.md` |
+| 3b `full_context` -> 7b `full_context` | citation recall | +0.129 [0.029, 0.247] | 7b citation gain separates under pairing | `analysis/paired_deltas/summary.md` |
+| 3b `rag_topk` -> 7b `rag_topk` | citation precision | +0.095 [0.013, 0.177] | 7b citation gain separates under pairing | `analysis/paired_deltas/summary.md` |
+
+This sharpens the v1 takeaway. RAG top-k and full-context remain tied on measured fact coverage for both model scales. The memory-compression losses are now stronger evidence, because several comparisons that had overlapping per-arm CIs become paired separations. The 7b fact-coverage deficit remains close to zero rather than decisive, while 7b citation gains survive the paired design.
 
 ## Streaming Timing
 
@@ -58,6 +77,8 @@ This is a local quantized Ollama result, not a serving-infrastructure benchmark.
 
 Bootstrap confidence intervals in `analysis/frontier/summary.md` are over repeated task traces, not a guarantee about broader workloads. The task set is 40 controlled tasks split across public-policy and synthetic-memory lanes.
 
+The A11 paired reanalysis in `analysis/paired_deltas/summary.md` is stronger for within-task comparisons, but it does not fix the literal scorer limitation or add long-context budget pressure. Those are A12 and A13's jobs.
+
 The scorer is deterministic and literal. It catches regressions consistently, but it will miss valid paraphrases and cannot judge reasoning quality beyond the expected facts/citations/schema checks.
 
 The workload exports remain producer-side task suites for `../inference-release-lab`; no record-format or schema change was made in v1.
@@ -67,6 +88,7 @@ The workload exports remain producer-side task suites for `../inference-release-
 - Cross-scale frontier: `analysis/frontier/frontier.svg`
 - Cross-scale summary: `analysis/frontier/summary.md`
 - 7b-minus-3b deltas: `analysis/frontier/model_deltas.md`
+- Paired task-level deltas: `analysis/paired_deltas/summary.md`
 - Abstention experiment: `analysis/abstention_variant/summary.md`
 - Raw traces: `results/local-matrix/**/traces.jsonl` and `results/abstention-variant/**/traces.jsonl`
 - Workload exports: `exports/public_ai_policy_v0.jsonl`, `exports/synthetic_agent_memory_v0.jsonl`
