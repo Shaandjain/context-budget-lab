@@ -1,0 +1,367 @@
+[
+  {
+    "baseline_model": "qwen2.5:3b",
+    "baseline_run_dir": "results/local-matrix/qwen2-5-3b/full_context/context-budget-20260612-020245",
+    "comparison_model": "qwen2.5:7b",
+    "comparison_run_dir": "results/local-matrix/qwen2-5-7b/full_context/context-budget-20260612-034806",
+    "delta": "comparison_minus_baseline",
+    "metrics": {
+      "abstain_correct": {
+        "baseline": 0.833333,
+        "baseline_ci_high": 0.966667,
+        "baseline_ci_low": 0.7,
+        "comparison": 0.733333,
+        "comparison_ci_high": 0.9,
+        "comparison_ci_low": 0.566667,
+        "delta": -0.1
+      },
+      "citation_precision": {
+        "baseline": 0.619167,
+        "baseline_ci_high": 0.676667,
+        "baseline_ci_low": 0.556667,
+        "comparison": 0.749084,
+        "comparison_ci_high": 0.795788,
+        "comparison_ci_low": 0.701465,
+        "delta": 0.129917
+      },
+      "citation_recall": {
+        "baseline": 0.847059,
+        "baseline_ci_high": 0.9,
+        "baseline_ci_low": 0.794118,
+        "comparison": 0.976471,
+        "comparison_ci_high": 0.994118,
+        "comparison_ci_low": 0.947059,
+        "delta": 0.129412
+      },
+      "fact_coverage": {
+        "baseline": 0.78475,
+        "baseline_ci_high": 0.826,
+        "baseline_ci_low": 0.739833,
+        "comparison": 0.724583,
+        "comparison_ci_high": 0.767083,
+        "comparison_ci_low": 0.677,
+        "delta": -0.060167
+      },
+      "input_tokens_mean": {
+        "baseline": 288.325,
+        "baseline_ci_high": 294.525,
+        "baseline_ci_low": 282.3,
+        "comparison": 292.25,
+        "comparison_ci_high": 298.245,
+        "comparison_ci_low": 286.56,
+        "delta": 3.925
+      },
+      "latency_p50_s": {
+        "baseline": 2.065289,
+        "baseline_ci_high": 2.215872,
+        "baseline_ci_low": 2.002938,
+        "comparison": 5.147994,
+        "comparison_ci_high": 5.860731,
+        "comparison_ci_low": 4.480462,
+        "delta": 3.082705
+      },
+      "schema_ok": {
+        "baseline": 0.77,
+        "baseline_ci_high": 0.825,
+        "baseline_ci_low": 0.71,
+        "comparison": 0.905,
+        "comparison_ci_high": 0.94,
+        "comparison_ci_low": 0.86,
+        "delta": 0.135
+      }
+    },
+    "strategy": "full_context"
+  },
+  {
+    "baseline_model": "qwen2.5:3b",
+    "baseline_run_dir": "results/local-matrix/qwen2-5-3b/prefix_cache_friendly/context-budget-20260612-023800",
+    "comparison_model": "qwen2.5:7b",
+    "comparison_run_dir": "results/local-matrix/qwen2-5-7b/prefix_cache_friendly/context-budget-20260612-050805",
+    "delta": "comparison_minus_baseline",
+    "metrics": {
+      "abstain_correct": {
+        "baseline": 0.1,
+        "baseline_ci_high": 0.2,
+        "baseline_ci_low": 0.0,
+        "comparison": 0.2,
+        "comparison_ci_high": 0.333333,
+        "comparison_ci_low": 0.066667,
+        "delta": 0.1
+      },
+      "citation_precision": {
+        "baseline": 0.599251,
+        "baseline_ci_high": 0.670412,
+        "baseline_ci_low": 0.529963,
+        "comparison": 0.678392,
+        "comparison_ci_high": 0.737018,
+        "comparison_ci_low": 0.61809,
+        "delta": 0.079141
+      },
+      "citation_recall": {
+        "baseline": 0.682353,
+        "baseline_ci_high": 0.747059,
+        "baseline_ci_low": 0.605882,
+        "comparison": 0.882353,
+        "comparison_ci_high": 0.929412,
+        "comparison_ci_low": 0.829412,
+        "delta": 0.2
+      },
+      "fact_coverage": {
+        "baseline": 0.73025,
+        "baseline_ci_high": 0.770583,
+        "baseline_ci_low": 0.68825,
+        "comparison": 0.732917,
+        "comparison_ci_high": 0.769583,
+        "comparison_ci_low": 0.690667,
+        "delta": 0.002667
+      },
+      "input_tokens_mean": {
+        "baseline": 304.775,
+        "baseline_ci_high": 309.775,
+        "baseline_ci_low": 299.86,
+        "comparison": 313.5,
+        "comparison_ci_high": 317.845,
+        "comparison_ci_low": 309.225,
+        "delta": 8.725
+      },
+      "latency_p50_s": {
+        "baseline": 1.919888,
+        "baseline_ci_high": 2.043138,
+        "baseline_ci_low": 1.872355,
+        "comparison": 5.03208,
+        "comparison_ci_high": 5.491918,
+        "comparison_ci_low": 4.750136,
+        "delta": 3.112192
+      },
+      "schema_ok": {
+        "baseline": 0.73,
+        "baseline_ci_high": 0.795,
+        "baseline_ci_low": 0.67,
+        "comparison": 0.895,
+        "comparison_ci_high": 0.935,
+        "comparison_ci_low": 0.855,
+        "delta": 0.165
+      }
+    },
+    "strategy": "prefix_cache_friendly"
+  },
+  {
+    "baseline_model": "qwen2.5:3b",
+    "baseline_run_dir": "results/local-matrix/qwen2-5-3b/rag_topk/context-budget-20260612-021101",
+    "comparison_model": "qwen2.5:7b",
+    "comparison_run_dir": "results/local-matrix/qwen2-5-7b/rag_topk/context-budget-20260612-040957",
+    "delta": "comparison_minus_baseline",
+    "metrics": {
+      "abstain_correct": {
+        "baseline": 0.666667,
+        "baseline_ci_high": 0.833333,
+        "baseline_ci_low": 0.5,
+        "comparison": 0.5,
+        "comparison_ci_high": 0.7,
+        "comparison_ci_low": 0.3,
+        "delta": -0.166667
+      },
+      "citation_precision": {
+        "baseline": 0.60871,
+        "baseline_ci_high": 0.668509,
+        "baseline_ci_low": 0.549246,
+        "comparison": 0.740248,
+        "comparison_ci_high": 0.795656,
+        "comparison_ci_low": 0.68484,
+        "delta": 0.131538
+      },
+      "citation_recall": {
+        "baseline": 0.911765,
+        "baseline_ci_high": 0.947059,
+        "baseline_ci_low": 0.864706,
+        "comparison": 0.970588,
+        "comparison_ci_high": 0.994118,
+        "comparison_ci_low": 0.941176,
+        "delta": 0.058823
+      },
+      "fact_coverage": {
+        "baseline": 0.766667,
+        "baseline_ci_high": 0.806083,
+        "baseline_ci_low": 0.72625,
+        "comparison": 0.726833,
+        "comparison_ci_high": 0.773667,
+        "comparison_ci_low": 0.681667,
+        "delta": -0.039834
+      },
+      "input_tokens_mean": {
+        "baseline": 286.775,
+        "baseline_ci_high": 291.6,
+        "baseline_ci_low": 281.88,
+        "comparison": 287.75,
+        "comparison_ci_high": 291.79,
+        "comparison_ci_low": 283.495,
+        "delta": 0.975
+      },
+      "latency_p50_s": {
+        "baseline": 2.740511,
+        "baseline_ci_high": 3.028232,
+        "baseline_ci_low": 2.512427,
+        "comparison": 4.203743,
+        "comparison_ci_high": 4.606246,
+        "comparison_ci_low": 4.105867,
+        "delta": 1.463232
+      },
+      "schema_ok": {
+        "baseline": 0.81,
+        "baseline_ci_high": 0.865,
+        "baseline_ci_low": 0.755,
+        "comparison": 0.88,
+        "comparison_ci_high": 0.925,
+        "comparison_ci_low": 0.83,
+        "delta": 0.07
+      }
+    },
+    "strategy": "rag_topk"
+  },
+  {
+    "baseline_model": "qwen2.5:3b",
+    "baseline_run_dir": "results/local-matrix/qwen2-5-3b/structured_memory/context-budget-20260612-022855",
+    "comparison_model": "qwen2.5:7b",
+    "comparison_run_dir": "results/local-matrix/qwen2-5-7b/structured_memory/context-budget-20260612-044524",
+    "delta": "comparison_minus_baseline",
+    "metrics": {
+      "abstain_correct": {
+        "baseline": 0.208333,
+        "baseline_ci_high": 0.333333,
+        "baseline_ci_low": 0.104167,
+        "comparison": 0.529412,
+        "comparison_ci_high": 0.705882,
+        "comparison_ci_low": 0.352941,
+        "delta": 0.321079
+      },
+      "citation_precision": {
+        "baseline": 0.560606,
+        "baseline_ci_high": 0.618687,
+        "baseline_ci_low": 0.504209,
+        "comparison": 0.639981,
+        "comparison_ci_high": 0.701311,
+        "comparison_ci_low": 0.579588,
+        "delta": 0.079375
+      },
+      "citation_recall": {
+        "baseline": 0.9,
+        "baseline_ci_high": 0.947059,
+        "baseline_ci_low": 0.852941,
+        "comparison": 0.835294,
+        "comparison_ci_high": 0.888235,
+        "comparison_ci_low": 0.776471,
+        "delta": -0.064706
+      },
+      "fact_coverage": {
+        "baseline": 0.576333,
+        "baseline_ci_high": 0.616917,
+        "baseline_ci_low": 0.532167,
+        "comparison": 0.592917,
+        "comparison_ci_high": 0.635583,
+        "comparison_ci_low": 0.54975,
+        "delta": 0.016584
+      },
+      "input_tokens_mean": {
+        "baseline": 265.675,
+        "baseline_ci_high": 269.625,
+        "baseline_ci_low": 261.8,
+        "comparison": 256.675,
+        "comparison_ci_high": 260.945,
+        "comparison_ci_low": 252.37,
+        "delta": -9.0
+      },
+      "latency_p50_s": {
+        "baseline": 2.376532,
+        "baseline_ci_high": 2.560619,
+        "baseline_ci_low": 2.266842,
+        "comparison": 5.943399,
+        "comparison_ci_high": 6.296437,
+        "comparison_ci_low": 5.334769,
+        "delta": 3.566867
+      },
+      "schema_ok": {
+        "baseline": 0.905,
+        "baseline_ci_high": 0.945,
+        "baseline_ci_low": 0.86,
+        "comparison": 0.73,
+        "comparison_ci_high": 0.79,
+        "comparison_ci_low": 0.665,
+        "delta": -0.175
+      }
+    },
+    "strategy": "structured_memory"
+  },
+  {
+    "baseline_model": "qwen2.5:3b",
+    "baseline_run_dir": "results/local-matrix/qwen2-5-3b/summary_memory/context-budget-20260612-022024",
+    "comparison_model": "qwen2.5:7b",
+    "comparison_run_dir": "results/local-matrix/qwen2-5-7b/summary_memory/context-budget-20260612-042607",
+    "delta": "comparison_minus_baseline",
+    "metrics": {
+      "abstain_correct": {
+        "baseline": 0.657143,
+        "baseline_ci_high": 0.8,
+        "baseline_ci_low": 0.485714,
+        "comparison": 0.666667,
+        "comparison_ci_high": 0.833333,
+        "comparison_ci_low": 0.5,
+        "delta": 0.009524
+      },
+      "citation_precision": {
+        "baseline": 0.571306,
+        "baseline_ci_high": 0.629725,
+        "baseline_ci_low": 0.513746,
+        "comparison": 0.521858,
+        "comparison_ci_high": 0.575137,
+        "comparison_ci_low": 0.468124,
+        "delta": -0.049448
+      },
+      "citation_recall": {
+        "baseline": 0.841176,
+        "baseline_ci_high": 0.894118,
+        "baseline_ci_low": 0.782353,
+        "comparison": 0.829412,
+        "comparison_ci_high": 0.882353,
+        "comparison_ci_low": 0.764706,
+        "delta": -0.011764
+      },
+      "fact_coverage": {
+        "baseline": 0.63625,
+        "baseline_ci_high": 0.674,
+        "baseline_ci_low": 0.594417,
+        "comparison": 0.594667,
+        "comparison_ci_high": 0.63075,
+        "comparison_ci_low": 0.556167,
+        "delta": -0.041583
+      },
+      "input_tokens_mean": {
+        "baseline": 238.275,
+        "baseline_ci_high": 241.74,
+        "baseline_ci_low": 234.38,
+        "comparison": 238.225,
+        "comparison_ci_high": 242.58,
+        "comparison_ci_low": 233.6,
+        "delta": -0.05
+      },
+      "latency_p50_s": {
+        "baseline": 2.479787,
+        "baseline_ci_high": 2.668422,
+        "baseline_ci_low": 2.0795,
+        "comparison": 4.920768,
+        "comparison_ci_high": 5.30146,
+        "comparison_ci_low": 4.540304,
+        "delta": 2.440981
+      },
+      "schema_ok": {
+        "baseline": 0.86,
+        "baseline_ci_high": 0.905,
+        "baseline_ci_low": 0.81,
+        "comparison": 0.67,
+        "comparison_ci_high": 0.735,
+        "comparison_ci_low": 0.6,
+        "delta": -0.19
+      }
+    },
+    "strategy": "summary_memory"
+  }
+]

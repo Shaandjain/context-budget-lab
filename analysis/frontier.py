@@ -28,9 +28,12 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     rows = summarize_matrix(args.results_root, resamples=args.resamples, seed=args.seed)
+    deltas = compare_models(rows)
     args.out_dir.mkdir(parents=True, exist_ok=True)
     (args.out_dir / "summary.json").write_text(json.dumps(rows, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (args.out_dir / "summary.md").write_text(markdown_table(rows), encoding="utf-8")
+    (args.out_dir / "model_deltas.json").write_text(json.dumps(deltas, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (args.out_dir / "model_deltas.md").write_text(delta_markdown_table(deltas), encoding="utf-8")
     (args.out_dir / "frontier.svg").write_text(frontier_svg(rows), encoding="utf-8")
     print(args.out_dir)
     return 0
@@ -57,7 +60,7 @@ def summarize_matrix(results_root: Path, *, resamples: int, seed: int) -> list[d
             row["metrics"][metric_name] = summarize_values(
                 values,
                 resamples=resamples,
-                seed=_metric_seed(seed, row["strategy"], metric_name),
+                seed=_metric_seed(seed, row["model"], row["strategy"], metric_name),
                 stat=metric_stat(metric_name),
             )
         rows.append(row)
@@ -66,6 +69,73 @@ def summarize_matrix(results_root: Path, *, resamples: int, seed: int) -> list[d
 
 def find_run_dirs(results_root: Path) -> list[Path]:
     return sorted(path.parent for path in results_root.rglob("run.json") if (path.parent / "traces.jsonl").exists())
+
+
+def compare_models(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    models = sorted({row["model"] for row in rows})
+    if len(models) < 2:
+        return []
+    baseline_model, comparison_model = _comparison_pair(models)
+    by_key = {(row["model"], row["strategy"]): row for row in rows}
+    strategies = sorted(
+        {
+            row["strategy"]
+            for row in rows
+            if (baseline_model, row["strategy"]) in by_key and (comparison_model, row["strategy"]) in by_key
+        }
+    )
+    deltas: list[dict[str, Any]] = []
+    for strategy in strategies:
+        baseline = by_key[(baseline_model, strategy)]
+        comparison = by_key[(comparison_model, strategy)]
+        metric_deltas: dict[str, dict[str, float | int | None]] = {}
+        for metric_name in delta_metric_names():
+            baseline_metric = baseline["metrics"][metric_name]
+            comparison_metric = comparison["metrics"][metric_name]
+            baseline_value = baseline_metric["value"]
+            comparison_value = comparison_metric["value"]
+            delta = None
+            if baseline_value is not None and comparison_value is not None:
+                delta = round(float(comparison_value) - float(baseline_value), 6)
+            metric_deltas[metric_name] = {
+                "baseline": baseline_value,
+                "comparison": comparison_value,
+                "delta": delta,
+                "baseline_ci_low": baseline_metric["ci_low"],
+                "baseline_ci_high": baseline_metric["ci_high"],
+                "comparison_ci_low": comparison_metric["ci_low"],
+                "comparison_ci_high": comparison_metric["ci_high"],
+            }
+        deltas.append(
+            {
+                "strategy": strategy,
+                "baseline_model": baseline_model,
+                "comparison_model": comparison_model,
+                "delta": "comparison_minus_baseline",
+                "baseline_run_dir": baseline["run_dir"],
+                "comparison_run_dir": comparison["run_dir"],
+                "metrics": metric_deltas,
+            }
+        )
+    return deltas
+
+
+def delta_metric_names() -> list[str]:
+    return [
+        "fact_coverage",
+        "citation_precision",
+        "citation_recall",
+        "schema_ok",
+        "abstain_correct",
+        "latency_p50_s",
+        "input_tokens_mean",
+    ]
+
+
+def _comparison_pair(models: list[str]) -> tuple[str, str]:
+    if "qwen2.5:3b" in models and "qwen2.5:7b" in models:
+        return "qwen2.5:3b", "qwen2.5:7b"
+    return models[0], models[1]
 
 
 def metric_values(records: list[dict[str, Any]]) -> dict[str, list[float]]:
@@ -156,6 +226,46 @@ def markdown_table(rows: list[dict[str, Any]]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def delta_markdown_table(deltas: list[dict[str, Any]]) -> str:
+    if not deltas:
+        return "_No matched model pairs found._\n"
+    comparison = f'{deltas[0]["comparison_model"]} - {deltas[0]["baseline_model"]}'
+    headers = [
+        "strategy",
+        "comparison",
+        "delta fact coverage",
+        "delta citation precision",
+        "delta citation recall",
+        "delta schema ok",
+        "delta abstain correct",
+        "delta p50 latency s",
+        "delta mean input tokens",
+        "comparison run",
+    ]
+    lines = ["| " + " | ".join(headers) + " |", "| " + " | ".join("---" for _ in headers) + " |"]
+    for row in deltas:
+        metrics = row["metrics"]
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    row["strategy"],
+                    comparison,
+                    _fmt_delta(metrics["fact_coverage"]["delta"]),
+                    _fmt_delta(metrics["citation_precision"]["delta"]),
+                    _fmt_delta(metrics["citation_recall"]["delta"]),
+                    _fmt_delta(metrics["schema_ok"]["delta"]),
+                    _fmt_delta(metrics["abstain_correct"]["delta"]),
+                    _fmt_delta(metrics["latency_p50_s"]["delta"], suffix="s"),
+                    _fmt_delta(metrics["input_tokens_mean"]["delta"]),
+                    row["comparison_run_dir"],
+                ]
+            )
+            + " |"
+        )
+    return "\n".join(lines) + "\n"
+
+
 def frontier_svg(rows: list[dict[str, Any]]) -> str:
     width = 920
     height = 560
@@ -209,8 +319,8 @@ def frontier_svg(rows: list[dict[str, Any]]) -> str:
             [
                 f'<line x1="{x_low:.1f}" y1="{y:.1f}" x2="{x_high:.1f}" y2="{y:.1f}" stroke="{color}" stroke-width="1.5" opacity="0.7"/>',
                 f'<line x1="{x:.1f}" y1="{y_low:.1f}" x2="{x:.1f}" y2="{y_high:.1f}" stroke="{color}" stroke-width="1.5" opacity="0.7"/>',
-                f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="{color}" opacity="0.74"/>',
-                f'<text x="{x + r + 6:.1f}" y="{y + 4:.1f}" font-family="Arial, sans-serif" font-size="12" fill="#222">{_escape(row["strategy"])}</text>',
+                f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="{color}" stroke="{_model_stroke(row["model"])}" stroke-width="2" opacity="0.74"/>',
+                f'<text x="{x + r + 6:.1f}" y="{y + 4:.1f}" font-family="Arial, sans-serif" font-size="12" fill="#222">{_escape(_point_label(row))}</text>',
             ]
         )
 
@@ -219,8 +329,8 @@ def frontier_svg(rows: list[dict[str, Any]]) -> str:
         color = palette.get(row["strategy"], "#444")
         lines.extend(
             [
-                f'<circle cx="790" cy="{y}" r="7" fill="{color}" opacity="0.74"/>',
-                f'<text x="806" y="{y + 4}" font-family="Arial, sans-serif" font-size="12">{_escape(row["strategy"])}</text>',
+                f'<circle cx="790" cy="{y}" r="7" fill="{color}" stroke="{_model_stroke(row["model"])}" stroke-width="2" opacity="0.74"/>',
+                f'<text x="806" y="{y + 4}" font-family="Arial, sans-serif" font-size="12">{_escape(_point_label(row))}</text>',
             ]
         )
     lines.append("</svg>")
@@ -249,8 +359,8 @@ def _percentile(values: list[float], fraction: float) -> float:
     return sorted_values[low] * (1 - weight) + sorted_values[high] * weight
 
 
-def _metric_seed(seed: int, strategy: str, metric: str) -> int:
-    return seed + sum(ord(ch) for ch in strategy + metric)
+def _metric_seed(seed: int, model: str, strategy: str, metric: str) -> int:
+    return seed + sum(ord(ch) for ch in model + strategy + metric)
 
 
 def _fmt_ci(metric: dict[str, float | int | None]) -> str:
@@ -258,6 +368,27 @@ def _fmt_ci(metric: dict[str, float | int | None]) -> str:
     if value is None:
         return "n/a"
     return f'{value:.3f} [{metric["ci_low"]:.3f}, {metric["ci_high"]:.3f}]'
+
+
+def _fmt_delta(value: float | int | None, *, suffix: str = "") -> str:
+    if value is None:
+        return "n/a"
+    sign = "+" if value > 0 else ""
+    return f"{sign}{value:.3f}{suffix}"
+
+
+def _point_label(row: dict[str, Any]) -> str:
+    return f'{_model_short_label(row["model"])} {row["strategy"]}'
+
+
+def _model_short_label(model: str) -> str:
+    if ":" in model:
+        return model.rsplit(":", maxsplit=1)[1]
+    return model
+
+
+def _model_stroke(model: str) -> str:
+    return "#111827" if _model_short_label(model) == "7b" else "#ffffff"
 
 
 def _scale(value: float, in_min: float, in_max: float, out_min: float, out_max: float) -> float:
