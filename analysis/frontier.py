@@ -147,6 +147,9 @@ def metric_values(records: list[dict[str, Any]]) -> dict[str, list[float]]:
         "abstain_correct": _meta_values(records, "abstain_correct"),
         "latency_p50_s": [record["latency_s"] for record in records],
         "latency_p95_s": [record["latency_s"] for record in records],
+        "ttft_p50_s": _streaming_record_values(records, "ttft_s"),
+        "tpot_mean_s": _streaming_record_values(records, "tpot_s"),
+        "decode_tokens_per_s_mean": _streaming_meta_values(records, "decode_tokens_per_s"),
         "input_tokens_mean": [record["input_tokens"] for record in records],
         "output_tokens_mean": [record["output_tokens"] for record in records],
     }
@@ -197,6 +200,9 @@ def markdown_table(rows: list[dict[str, Any]]) -> str:
         "schema ok",
         "abstain correct",
         "p50 latency s",
+        "p50 TTFT s",
+        "mean TPOT s",
+        "mean decode tok/s",
         "mean input tokens",
         "source",
     ]
@@ -217,6 +223,9 @@ def markdown_table(rows: list[dict[str, Any]]) -> str:
                     _fmt_ci(metrics["schema_ok"]),
                     _fmt_ci(metrics["abstain_correct"]),
                     _fmt_ci(metrics["latency_p50_s"]),
+                    _fmt_ci(metrics["ttft_p50_s"]),
+                    _fmt_ci(metrics["tpot_mean_s"]),
+                    _fmt_ci(metrics["decode_tokens_per_s_mean"]),
                     _fmt_ci(metrics["input_tokens_mean"]),
                     row["run_dir"],
                 ]
@@ -344,6 +353,28 @@ def _meta_values(records: list[dict[str, Any]], key: str) -> list[float]:
         if isinstance(value, bool):
             values.append(1.0 if value else 0.0)
         elif isinstance(value, int | float):
+            values.append(float(value))
+    return values
+
+
+def _streaming_record_values(records: list[dict[str, Any]], key: str) -> list[float]:
+    values: list[float] = []
+    for record in records:
+        if record.get("meta", {}).get("timing_mode") != "streaming":
+            continue
+        value = record.get(key)
+        if isinstance(value, int | float):
+            values.append(float(value))
+    return values
+
+
+def _streaming_meta_values(records: list[dict[str, Any]], key: str) -> list[float]:
+    values: list[float] = []
+    for record in records:
+        if record.get("meta", {}).get("timing_mode") != "streaming":
+            continue
+        value = record.get("meta", {}).get(key)
+        if isinstance(value, int | float):
             values.append(float(value))
     return values
 

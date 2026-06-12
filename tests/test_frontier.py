@@ -40,6 +40,8 @@ def test_summarize_matrix_computes_bootstrap_rows(tmp_path: Path) -> None:
     assert row["n"] == 2
     assert row["metrics"]["fact_coverage"]["value"] == 0.75
     assert row["metrics"]["latency_p50_s"]["value"] == 3.0
+    assert row["metrics"]["ttft_p50_s"]["value"] == 0.5
+    assert row["metrics"]["tpot_mean_s"]["value"] == 0.05
     assert "fact coverage" in markdown_table(rows)
 
 
@@ -111,10 +113,14 @@ def _record(strategy: str, fact_coverage: float, latency_s: float, input_tokens:
     return {
         "strategy": strategy,
         "latency_s": latency_s,
+        "ttft_s": 0.5,
+        "tpot_s": 0.05,
         "input_tokens": input_tokens,
         "output_tokens": 10,
         "error": None,
         "meta": {
+            "timing_mode": "streaming",
+            "decode_tokens_per_s": 20.0,
             "fact_coverage": fact_coverage,
             "citation_precision": 1.0,
             "citation_recall": 1.0,

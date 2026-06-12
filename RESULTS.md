@@ -1,61 +1,72 @@
-# Context Budget Lab v0 Results
+# Context Budget Lab v1 Results
 
-Reproduce the v0 analysis from committed traces:
+Reproduce the v1 analysis from committed traces:
 
 ```bash
 uv run python analysis/frontier.py results/local-matrix --out-dir analysis/frontier --resamples 1000 --seed 1729
+uv run python analysis/abstention_variant.py --baseline-root results/local-matrix --variant-root results/abstention-variant --out-dir analysis/abstention_variant --dataset-id synthetic_agent_memory_v0 --models qwen2.5:3b,qwen2.5:7b
+uv run python benchmarks/export_workloads.py
+uv run pytest
 ```
 
 ## Research Question
 
-For citation-QA and synthetic agent-memory workloads on a small local model, which context strategy gives the best quality-latency-cost frontier: full context, lexical RAG top-k, summary memory, structured memory, or prefix-cache-friendly prompting?
+Does the context-strategy frontier shift between `qwen2.5:3b` and `qwen2.5:7b`, what does streaming TTFT show once the client streams tokens, and is the prefix-cache abstention failure fixable with one explicit instruction?
 
 ## Setup
 
-The v0 run used local Ollama on an M3 Pro with `qwen2.5:3b`, temperature 0, seed 1729, 40 tasks, 5 repeats, and 5 strategies for 1,000 live requests. The committed trace directories under `results/local-matrix/qwen2-5-3b/*/context-budget-20260612-*` each contain 200 records and 0 request errors; the bootstrap summary in `analysis/frontier/summary.json` is generated from those traces.
+All runs used local Ollama on an M3 Pro, temperature 0, seed 1729, public or synthetic datasets only, and deterministic scoring. No GPU, Modal, paid API, embedding model, new Python dependency, or LLM judge was used.
 
-No GPU, Modal, paid API, embeddings, or LLM judge was used. Cost is prompt-token proxy only in v0.
+The cross-scale matrix uses the existing 3b v0 traces and the new 7b streaming traces under `results/local-matrix`. Each model/strategy condition has 200 records and 0 request errors. The 3b matrix predates the streaming client, so `analysis/frontier/summary.md` intentionally reports `n/a` for 3b TTFT/TPOT. The 7b rows and A8 variant rows have real streaming `ttft_s`, `tpot_s`, and decode-rate fields.
 
-## Summary Table
+## Cross-Scale Result
 
-Generated from `analysis/frontier/summary.md`:
+The 7b model did not broadly dominate the 3b model on fact coverage at this N. The per-strategy 7b-minus-3b deltas in `analysis/frontier/model_deltas.md` were: full context -0.060, RAG top-k -0.040, prefix-cache-friendly +0.003, structured memory +0.017, and summary memory -0.042.
 
-| model | strategy | n | errors | fact coverage | citation precision | citation recall | schema ok | abstain correct | p50 latency s | mean input tokens | source |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| qwen2.5:3b | full_context | 200 | 0 | 0.785 [0.738, 0.827] | 0.619 [0.557, 0.681] | 0.847 [0.794, 0.900] | 0.770 [0.705, 0.825] | 0.833 [0.700, 0.967] | 2.065 [2.003, 2.209] | 288.325 [282.510, 294.285] | `results/local-matrix/qwen2-5-3b/full_context/context-budget-20260612-020245` |
-| qwen2.5:3b | prefix_cache_friendly | 200 | 0 | 0.730 [0.687, 0.772] | 0.599 [0.533, 0.670] | 0.682 [0.618, 0.753] | 0.730 [0.665, 0.790] | 0.100 [0.000, 0.200] | 1.920 [1.872, 2.045] | 304.775 [299.925, 309.765] | `results/local-matrix/qwen2-5-3b/prefix_cache_friendly/context-budget-20260612-023800` |
-| qwen2.5:3b | rag_topk | 200 | 0 | 0.767 [0.720, 0.810] | 0.609 [0.554, 0.665] | 0.912 [0.871, 0.953] | 0.810 [0.750, 0.860] | 0.667 [0.500, 0.833] | 2.741 [2.483, 3.028] | 286.775 [282.070, 291.380] | `results/local-matrix/qwen2-5-3b/rag_topk/context-budget-20260612-021101` |
-| qwen2.5:3b | structured_memory | 200 | 0 | 0.576 [0.535, 0.618] | 0.561 [0.502, 0.614] | 0.900 [0.853, 0.941] | 0.905 [0.865, 0.945] | 0.208 [0.104, 0.333] | 2.377 [2.268, 2.562] | 265.675 [261.345, 269.915] | `results/local-matrix/qwen2-5-3b/structured_memory/context-budget-20260612-022855` |
-| qwen2.5:3b | summary_memory | 200 | 0 | 0.636 [0.596, 0.678] | 0.571 [0.511, 0.626] | 0.841 [0.782, 0.894] | 0.860 [0.810, 0.905] | 0.657 [0.486, 0.800] | 2.480 [2.080, 2.668] | 238.275 [234.515, 242.355] | `results/local-matrix/qwen2-5-3b/summary_memory/context-budget-20260612-022024` |
+The 7b model did improve several citation and schema measures on context-heavy strategies. From `analysis/frontier/model_deltas.md`, citation recall moved +0.129 for full context, +0.059 for RAG top-k, and +0.200 for prefix-cache-friendly; schema compliance moved +0.135 for full context, +0.070 for RAG top-k, and +0.165 for prefix-cache-friendly. Memory strategies did not get the same clean lift: summary memory schema moved -0.190 and structured memory schema moved -0.175.
 
-## Findings
+The latency cost of scale is clear in the same delta table. 7b p50 end-to-end latency moved +3.083s for full context, +1.463s for RAG top-k, +3.112s for prefix-cache-friendly, +3.567s for structured memory, and +2.441s for summary memory.
 
-Full context had the highest fact coverage at 0.785 [0.738, 0.827] from `analysis/frontier/summary.json`, but it is indistinguishable from RAG top-k at this N because RAG fact coverage was 0.767 [0.720, 0.810] from `analysis/frontier/summary.json`.
+## Streaming Timing
 
-RAG top-k had the best citation recall at 0.912 [0.871, 0.953] from `analysis/frontier/summary.json`, while full context was 0.847 [0.794, 0.900] from `analysis/frontier/summary.json`.
+The 7b matrix now separates first-token and decode timing. From `analysis/frontier/summary.md`, RAG top-k had p50 TTFT 1.059s, mean TPOT 0.030s, and p50 end-to-end latency 4.204s. Full context had p50 TTFT 1.847s, mean TPOT 0.035s, and p50 latency 5.148s. Prefix-cache-friendly had p50 TTFT 1.331s, mean TPOT 0.038s, and p50 latency 5.032s.
 
-Prefix-cache-friendly prompting had the fastest p50 latency at 1.920s [1.872, 2.045] from `analysis/frontier/summary.json`, but its citation recall was lower at 0.682 [0.618, 0.753] and its abstention correctness was only 0.100 [0.000, 0.200] from `analysis/frontier/summary.json`.
+This fixes the v0 measurement issue for new live runs: TTFT is no longer just total request latency. It does not retroactively make the 3b matrix a TTFT result; those rows remain `n/a` for streaming timing in `analysis/frontier/summary.md`.
 
-Summary memory reduced mean input tokens to 238.275 [234.515, 242.355] from `analysis/frontier/summary.json`, but fact coverage dropped to 0.636 [0.596, 0.678].
+## Abstention Variant
 
-Structured memory had the best schema compliance at 0.905 [0.865, 0.945] from `analysis/frontier/summary.json`, but it lost too much answer content: fact coverage was 0.576 [0.535, 0.618].
+A8 added one controlled variant, `prefix_cache_abstain`: same lexical top-k retrieval and same request-specific payload as `prefix_cache_friendly`, but the stable prefix explicitly says to report insufficient evidence instead of guessing. The comparison in `analysis/abstention_variant/summary.md` filters both baseline and variant to `synthetic_agent_memory_v0`.
+
+| model | baseline abstain | variant abstain | delta | baseline useful | variant useful | source |
+| --- | --- | --- | --- | --- | --- | --- |
+| qwen2.5:3b | 0.100 | 0.000 | -0.100 | 38 | 40 | `analysis/abstention_variant/summary.md` |
+| qwen2.5:7b | 0.200 | 0.633 | +0.433 | 48 | 25 | `analysis/abstention_variant/summary.md` |
+
+The variant is not a clean fix. On 3b it made abstention worse. On 7b it improved abstention correctness, but fact coverage fell 0.657 -> 0.557, schema compliance fell 0.950 -> 0.810, and useful answers dropped 48 -> 25, all from `analysis/abstention_variant/summary.md`. Instruction placement matters, but the prefix-cache failure is not solved by adding one sentence.
 
 ## Negative Results / Surprises
 
-The memory strategies cited often enough to look superficially credible, but they lost required facts. This repeats the week-3 warning: citation quality and answer quality must stay separate.
+The larger model mostly improved citation behavior, not answer coverage. That matters for agent memory systems: better-looking citations can still hide missing facts.
 
-Prefix-cache-friendly prompting was fastest in this local run but failed many missing-memory questions. The current prompt shape appears to encourage an answer even when the memory is insufficient.
+Prefix-cache-friendly remained the fastest-looking and most cacheable prompt shape in intent, but the original abstention failure persisted on 7b: `analysis/frontier/summary.md` reports abstain-correct 0.200 for 7b prefix-cache-friendly, versus 0.733 for 7b full context.
 
-Lexical RAG did not beat full context on latency in the local Ollama run. Its p50 latency was 2.741s [2.483, 3.028] from `analysis/frontier/summary.json`, slower than full context at 2.065s [2.003, 2.209], likely because answer length and local serving variance dominate prompt length at this scale.
+The optional embedding retrieval variant was not run. `nomic-embed-text` was not installed locally, and adding embedding retrieval would require new embedding endpoint plumbing plus another experiment matrix. A10 therefore reports lexical retrieval only.
 
 ## Limitations
 
-This is a small local-model result, not a serving-infrastructure result. Non-streaming Ollama records observable request latency as TTFT, so TTFT/TBT conclusions should not be drawn from this v0.
+This is a local quantized Ollama result, not a serving-infrastructure benchmark. End-to-end latency is useful for this machine, but it should not be generalized to GPU serving.
 
-The retrieval baseline is lexical top-k over task-local context, not embeddings. The scoring is deterministic literal matching, so it intentionally misses valid paraphrases.
+Bootstrap confidence intervals in `analysis/frontier/summary.md` are over repeated task traces, not a guarantee about broader workloads. The task set is 40 controlled tasks split across public-policy and synthetic-memory lanes.
 
-All public-policy snippets are self-written summaries of public sources rather than full-document retrieval. The synthetic memory lane is useful for controlled behavior, not a claim about real user memory distribution.
+The scorer is deterministic and literal. It catches regressions consistently, but it will miss valid paraphrases and cannot judge reasoning quality beyond the expected facts/citations/schema checks.
 
-## Frontier Chart
+The workload exports remain producer-side task suites for `../inference-release-lab`; no record-format or schema change was made in v1.
 
-`analysis/frontier/frontier.svg` plots fact coverage against p50 latency with point size as mean prompt tokens. The chart is generated from `analysis/frontier/summary.json`.
+## Review Packet
+
+- Cross-scale frontier: `analysis/frontier/frontier.svg`
+- Cross-scale summary: `analysis/frontier/summary.md`
+- 7b-minus-3b deltas: `analysis/frontier/model_deltas.md`
+- Abstention experiment: `analysis/abstention_variant/summary.md`
+- Raw traces: `results/local-matrix/**/traces.jsonl` and `results/abstention-variant/**/traces.jsonl`
+- Workload exports: `exports/public_ai_policy_v0.jsonl`, `exports/synthetic_agent_memory_v0.jsonl`

@@ -20,6 +20,12 @@
         "n": 170,
         "value": 0.847059
       },
+      "decode_tokens_per_s_mean": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
+      },
       "fact_coverage": {
         "ci_high": 0.826,
         "ci_low": 0.739833,
@@ -55,6 +61,18 @@
         "ci_low": 0.71,
         "n": 200,
         "value": 0.77
+      },
+      "tpot_mean_s": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
+      },
+      "ttft_p50_s": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
       }
     },
     "model": "qwen2.5:3b",
@@ -85,6 +103,12 @@
         "ci_low": 0.605882,
         "n": 170,
         "value": 0.682353
+      },
+      "decode_tokens_per_s_mean": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
       },
       "fact_coverage": {
         "ci_high": 0.770583,
@@ -121,6 +145,18 @@
         "ci_low": 0.67,
         "n": 200,
         "value": 0.73
+      },
+      "tpot_mean_s": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
+      },
+      "ttft_p50_s": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
       }
     },
     "model": "qwen2.5:3b",
@@ -151,6 +187,12 @@
         "ci_low": 0.864706,
         "n": 170,
         "value": 0.911765
+      },
+      "decode_tokens_per_s_mean": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
       },
       "fact_coverage": {
         "ci_high": 0.806083,
@@ -187,6 +229,18 @@
         "ci_low": 0.755,
         "n": 200,
         "value": 0.81
+      },
+      "tpot_mean_s": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
+      },
+      "ttft_p50_s": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
       }
     },
     "model": "qwen2.5:3b",
@@ -217,6 +271,12 @@
         "ci_low": 0.852941,
         "n": 170,
         "value": 0.9
+      },
+      "decode_tokens_per_s_mean": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
       },
       "fact_coverage": {
         "ci_high": 0.616917,
@@ -253,6 +313,18 @@
         "ci_low": 0.86,
         "n": 200,
         "value": 0.905
+      },
+      "tpot_mean_s": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
+      },
+      "ttft_p50_s": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
       }
     },
     "model": "qwen2.5:3b",
@@ -283,6 +355,12 @@
         "ci_low": 0.782353,
         "n": 170,
         "value": 0.841176
+      },
+      "decode_tokens_per_s_mean": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
       },
       "fact_coverage": {
         "ci_high": 0.674,
@@ -319,6 +397,18 @@
         "ci_low": 0.81,
         "n": 200,
         "value": 0.86
+      },
+      "tpot_mean_s": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
+      },
+      "ttft_p50_s": {
+        "ci_high": null,
+        "ci_low": null,
+        "n": 0,
+        "value": null
       }
     },
     "model": "qwen2.5:3b",
@@ -349,6 +439,12 @@
         "ci_low": 0.947059,
         "n": 170,
         "value": 0.976471
+      },
+      "decode_tokens_per_s_mean": {
+        "ci_high": 30.589377,
+        "ci_low": 29.042453,
+        "n": 200,
+        "value": 29.846642
       },
       "fact_coverage": {
         "ci_high": 0.767083,
@@ -385,6 +481,18 @@
         "ci_low": 0.86,
         "n": 200,
         "value": 0.905
+      },
+      "tpot_mean_s": {
+        "ci_high": 0.03563,
+        "ci_low": 0.033792,
+        "n": 200,
+        "value": 0.034673
+      },
+      "ttft_p50_s": {
+        "ci_high": 1.986366,
+        "ci_low": 1.693855,
+        "n": 200,
+        "value": 1.846912
       }
     },
     "model": "qwen2.5:7b",
@@ -415,6 +523,12 @@
         "ci_low": 0.829412,
         "n": 170,
         "value": 0.882353
+      },
+      "decode_tokens_per_s_mean": {
+        "ci_high": 27.321454,
+        "ci_low": 26.41614,
+        "n": 200,
+        "value": 26.912455
       },
       "fact_coverage": {
         "ci_high": 0.769583,
@@ -451,6 +565,18 @@
         "ci_low": 0.855,
         "n": 200,
         "value": 0.895
+      },
+      "tpot_mean_s": {
+        "ci_high": 0.038426,
+        "ci_low": 0.037074,
+        "n": 200,
+        "value": 0.037731
+      },
+      "ttft_p50_s": {
+        "ci_high": 1.360285,
+        "ci_low": 1.301299,
+        "n": 200,
+        "value": 1.33097
       }
     },
     "model": "qwen2.5:7b",
@@ -481,6 +607,12 @@
         "ci_low": 0.941176,
         "n": 170,
         "value": 0.970588
+      },
+      "decode_tokens_per_s_mean": {
+        "ci_high": 34.122479,
+        "ci_low": 33.076042,
+        "n": 200,
+        "value": 33.595073
       },
       "fact_coverage": {
         "ci_high": 0.773667,
@@ -517,6 +649,18 @@
         "ci_low": 0.83,
         "n": 200,
         "value": 0.88
+      },
+      "tpot_mean_s": {
+        "ci_high": 0.030675,
+        "ci_low": 0.029683,
+        "n": 200,
+        "value": 0.030184
+      },
+      "ttft_p50_s": {
+        "ci_high": 1.077985,
+        "ci_low": 1.040578,
+        "n": 200,
+        "value": 1.058683
       }
     },
     "model": "qwen2.5:7b",
@@ -547,6 +691,12 @@
         "ci_low": 0.776471,
         "n": 170,
         "value": 0.835294
+      },
+      "decode_tokens_per_s_mean": {
+        "ci_high": 28.258,
+        "ci_low": 27.548617,
+        "n": 200,
+        "value": 27.909794
       },
       "fact_coverage": {
         "ci_high": 0.635583,
@@ -583,6 +733,18 @@
         "ci_low": 0.665,
         "n": 200,
         "value": 0.73
+      },
+      "tpot_mean_s": {
+        "ci_high": 0.036601,
+        "ci_low": 0.035686,
+        "n": 200,
+        "value": 0.036142
+      },
+      "ttft_p50_s": {
+        "ci_high": 1.219307,
+        "ci_low": 1.166357,
+        "n": 200,
+        "value": 1.19209
       }
     },
     "model": "qwen2.5:7b",
@@ -613,6 +775,12 @@
         "ci_low": 0.764706,
         "n": 170,
         "value": 0.829412
+      },
+      "decode_tokens_per_s_mean": {
+        "ci_high": 32.390285,
+        "ci_low": 31.351887,
+        "n": 200,
+        "value": 31.899658
       },
       "fact_coverage": {
         "ci_high": 0.63075,
@@ -649,6 +817,18 @@
         "ci_low": 0.6,
         "n": 200,
         "value": 0.67
+      },
+      "tpot_mean_s": {
+        "ci_high": 0.032391,
+        "ci_low": 0.031311,
+        "n": 200,
+        "value": 0.031829
+      },
+      "ttft_p50_s": {
+        "ci_high": 1.009915,
+        "ci_low": 0.965824,
+        "n": 200,
+        "value": 0.987097
       }
     },
     "model": "qwen2.5:7b",
