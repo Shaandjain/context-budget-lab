@@ -6,7 +6,7 @@ Benchmark suite answering: when should an agent use full context, retrieval, str
 
 **Second job (added 2026-06-11):** every task here doubles as a release-gate workload for `../inference-release-lab`. Task records must stay importable as gate suites: each carries `task_id`, `dataset_id`, expected source/citation IDs, expected facts, an output schema name, difficulty, and tags. Window compressed to weeks 3–5 (see `../ROADMAP.md`); v0 = 40 real tasks, deterministic judging, repeated runs with variance, one frontier chart.
 
-**Status:** in progress. The first runnable slice is live: v0 public-policy and synthetic-agent-memory datasets, five baseline context strategies, shared JSONL traces, summary output, and a real local Ollama smoke run.
+**Status:** v0 complete (2026-06-11) — 40 tasks, five strategies, 1,000-request local matrix on `qwen2.5:3b`, bootstrap-CI frontier, workload exports shipped. Findings and limitations in `RESULTS.md`. v1 in progress (see `PLAN.md`): streaming TTFT, `qwen2.5:7b` cross-scale matrix, abstention experiment.
 
 Measures answer + citation accuracy alongside TTFT, TPOT/TBT, p50/p95, throughput, context tokens, cache hit rate, and cost per 1K useful answers. Datasets: public legal/policy docs, agent task logs, synthetic geo-audio transcripts (all public or synthetic, labeled).
 
