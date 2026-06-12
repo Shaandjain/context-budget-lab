@@ -79,3 +79,27 @@ def test_write_jsonl_record(tmp_path: Path) -> None:
     write_jsonl_record(path, record)
 
     assert path.read_text(encoding="utf-8").count("\n") == 1
+
+
+def test_validate_trace_record_accepts_streaming_tpot() -> None:
+    record = TraceRecord(
+        schema_version=SCHEMA_VERSION,
+        run_id="run-1",
+        source="live",
+        request_id="req-1",
+        ts_arrival_s=0.0,
+        strategy="full_context",
+        model="qwen2.5:7b",
+        endpoint="http://localhost:11434/v1",
+        input_tokens=40,
+        output_tokens=8,
+        queue_wait_s=None,
+        ttft_s=0.4,
+        tpot_s=0.05,
+        latency_s=0.75,
+        error=None,
+        cost_usd=None,
+        meta={"timing_mode": "streaming", "decode_tokens_per_s": 20.0},
+    )
+
+    validate_record(record)

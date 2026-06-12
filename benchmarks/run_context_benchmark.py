@@ -99,6 +99,12 @@ def main(argv: list[str] | None = None) -> int:
                         "evidence_recall": scores["evidence_recall"],
                         "schema_ok": scores["schema_ok"],
                         "abstain_correct": scores["abstain_correct"],
+                        "timing_mode": "mock" if args.mock else "streaming",
+                        "decode_tokens_per_s": _decode_tokens_per_s(
+                            completion.output_tokens,
+                            completion.ttft_s,
+                            completion.latency_s,
+                        ),
                         "prefix_cacheable_tokens": _prefix_cacheable_tokens(strategy_name, strategy_result["prompt"]),
                         "strategy_build_cost_usd": 0.0,
                         "strategy_metadata": strategy_meta,
@@ -186,6 +192,15 @@ def _prefix_cacheable_tokens(strategy_name: str, prompt: str) -> int:
         return 0
     prefix = prompt.split("Payload:", 1)[0]
     return estimate_tokens(prefix)
+
+
+def _decode_tokens_per_s(output_tokens: int | None, ttft_s: float, latency_s: float) -> float | None:
+    if output_tokens is None or output_tokens <= 1:
+        return None
+    decode_s = max(0.0, latency_s - ttft_s)
+    if decode_s == 0:
+        return None
+    return (output_tokens - 1) / decode_s
 
 
 def _split_csv(value: str) -> list[str]:

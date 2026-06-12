@@ -21,11 +21,15 @@ def test_cli_mock_smoke_writes_shared_trace(tmp_path: Path) -> None:
     assert len(lines) == 10
     first = json.loads(lines[0])
     assert first["schema_version"] == "0.1"
+    assert first["ttft_s"] < first["latency_s"]
+    assert first["tpot_s"] is not None
     assert "fact_coverage" in first["meta"]
     assert "citation_precision" in first["meta"]
     assert "citation_recall" in first["meta"]
     assert "schema_ok" in first["meta"]
     assert "abstain_correct" in first["meta"]
+    assert first["meta"]["timing_mode"] == "mock"
+    assert first["meta"]["decode_tokens_per_s"] is not None
 
     summary = summarize_records([json.loads(line) for line in lines])
     assert "avg_fact_coverage" in summary[0]

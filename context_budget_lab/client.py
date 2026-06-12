@@ -34,7 +34,7 @@ class ChatClient(Protocol):
 
 
 class OpenAICompatClient:
-    """Minimal `/v1/chat/completions` client for Ollama, llama.cpp, or hosted APIs."""
+    """Minimal streaming `/v1/chat/completions` client for local OpenAI-compatible APIs."""
 
     def __init__(self, base_url: str, model: str, timeout_s: float = 120.0) -> None:
         self.base_url = base_url.rstrip("/")
@@ -53,7 +53,7 @@ class OpenAICompatClient:
             "messages": messages,
             "max_tokens": max_tokens,
             "temperature": temperature,
-            "stream": False,
+            "stream": True,
         }
         body = json.dumps(payload).encode("utf-8")
         req = request.Request(
@@ -66,29 +66,21 @@ class OpenAICompatClient:
         start = time.perf_counter()
         try:
             with request.urlopen(req, timeout=self.timeout_s) as response:
-                raw = response.read()
+                result = _read_streaming_response(response, start=start)
         except error.URLError as exc:
             latency_s = time.perf_counter() - start
             raise RuntimeError(f"OpenAI-compatible request failed after {latency_s:.2f}s: {exc}") from exc
 
-        latency_s = time.perf_counter() - start
-        parsed = json.loads(raw.decode("utf-8"))
-        choice = parsed.get("choices", [{}])[0]
-        message = choice.get("message", {})
-        text = str(message.get("content", "")).strip()
-        usage = parsed.get("usage", {})
-        output_tokens = _int_or_none(usage.get("completion_tokens"))
-        input_tokens = _int_or_none(usage.get("prompt_tokens"))
-
-        # Non-streaming endpoints do not expose first-token timing. Record the
-        # observable latency as TTFT and leave TPOT unknown.
+        text = result["text"]
+        input_tokens = result["input_tokens"] or estimate_tokens(_messages_text(messages))
+        output_tokens = result["output_tokens"] or estimate_tokens(text)
         return CompletionResult(
             text=text,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
-            ttft_s=latency_s,
-            tpot_s=None,
-            latency_s=latency_s,
+            ttft_s=result["ttft_s"],
+            tpot_s=_tpot(result["ttft_s"], result["latency_s"], output_tokens),
+            latency_s=result["latency_s"],
         )
 
 
@@ -116,13 +108,15 @@ class MockClient:
             answer += " Citations: " + " ".join(f"[{source_id}]" for source_id in source_ids[:2])
         answer = answer[: max(40, max_tokens * 6)]
         output_tokens = estimate_tokens(answer)
-        latency_s = 0.001
+        ttft_s = 0.001
+        tpot_s = 0.0005 if output_tokens > 1 else None
+        latency_s = ttft_s + ((output_tokens - 1) * tpot_s if tpot_s is not None else 0.0)
         return CompletionResult(
             text=answer,
             input_tokens=estimate_tokens(prompt),
             output_tokens=output_tokens,
-            ttft_s=latency_s,
-            tpot_s=0.0 if output_tokens > 1 else None,
+            ttft_s=ttft_s,
+            tpot_s=tpot_s,
             latency_s=latency_s,
         )
 
@@ -139,6 +133,65 @@ def _int_or_none(value: object) -> int | None:
     if isinstance(value, int):
         return value
     return None
+
+
+def _messages_text(messages: list[ChatMessage]) -> str:
+    return "\n".join(message["content"] for message in messages)
+
+
+def _read_streaming_response(response: object, *, start: float) -> dict[str, object]:
+    chunks: list[str] = []
+    first_content_s: float | None = None
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+
+    for raw_line in response:
+        line = _decode_stream_line(raw_line)
+        if not line or not line.startswith("data:"):
+            continue
+        payload = line.removeprefix("data:").strip()
+        if payload == "[DONE]":
+            break
+
+        parsed = json.loads(payload)
+        usage = parsed.get("usage")
+        if isinstance(usage, dict):
+            input_tokens = _int_or_none(usage.get("prompt_tokens")) or input_tokens
+            output_tokens = _int_or_none(usage.get("completion_tokens")) or output_tokens
+
+        for choice in parsed.get("choices", []):
+            if not isinstance(choice, dict):
+                continue
+            delta = choice.get("delta")
+            if not isinstance(delta, dict):
+                continue
+            content = delta.get("content")
+            if not isinstance(content, str) or not content:
+                continue
+            if first_content_s is None:
+                first_content_s = time.perf_counter() - start
+            chunks.append(content)
+
+    latency_s = time.perf_counter() - start
+    return {
+        "text": "".join(chunks).strip(),
+        "input_tokens": input_tokens,
+        "output_tokens": output_tokens,
+        "ttft_s": first_content_s if first_content_s is not None else latency_s,
+        "latency_s": latency_s,
+    }
+
+
+def _decode_stream_line(raw_line: object) -> str:
+    if isinstance(raw_line, bytes):
+        return raw_line.decode("utf-8").strip()
+    return str(raw_line).strip()
+
+
+def _tpot(ttft_s: float, latency_s: float, output_tokens: int | None) -> float | None:
+    if output_tokens is None or output_tokens <= 1:
+        return None
+    return max(0.0, latency_s - ttft_s) / (output_tokens - 1)
 
 
 def _extract_bracketed_source_ids(text: str) -> list[str]:
