@@ -26,13 +26,16 @@ def summarize_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for strategy, strategy_records in sorted(by_strategy.items()):
         ok_records = [record for record in strategy_records if record.get("error") is None]
-        quality = [_meta_float(record, "answer_score") for record in ok_records]
-        citations = [_meta_float(record, "citation_score") for record in ok_records]
-        evidence = [_meta_float(record, "evidence_recall") for record in ok_records]
+        fact_coverage = _meta_numbers(ok_records, "fact_coverage")
+        citation_precision = _meta_numbers(ok_records, "citation_precision")
+        citation_recall = _meta_numbers(ok_records, "citation_recall")
+        evidence = _meta_numbers(ok_records, "evidence_recall")
+        schema_ok = _meta_numbers(ok_records, "schema_ok")
+        abstain_correct = _meta_numbers(ok_records, "abstain_correct")
         useful = [
             record
             for record in ok_records
-            if _meta_float(record, "answer_score") >= 0.7 and _meta_float(record, "citation_score") >= 0.7
+            if _is_useful(record)
         ]
         total_cost = sum(_record_cost(record) for record in ok_records)
         rows.append(
@@ -43,9 +46,12 @@ def summarize_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "avg_input_tokens": round(mean(record["input_tokens"] for record in ok_records), 2) if ok_records else None,
                 "avg_output_tokens": round(mean(record["output_tokens"] for record in ok_records), 2) if ok_records else None,
                 "avg_latency_s": round(mean(record["latency_s"] for record in ok_records), 4) if ok_records else None,
-                "avg_answer_score": round(mean(quality), 3) if quality else None,
-                "avg_citation_score": round(mean(citations), 3) if citations else None,
+                "avg_fact_coverage": round(mean(fact_coverage), 3) if fact_coverage else None,
+                "avg_citation_precision": round(mean(citation_precision), 3) if citation_precision else None,
+                "avg_citation_recall": round(mean(citation_recall), 3) if citation_recall else None,
                 "avg_evidence_recall": round(mean(evidence), 3) if evidence else None,
+                "avg_schema_ok": round(mean(schema_ok), 3) if schema_ok else None,
+                "avg_abstain_correct": round(mean(abstain_correct), 3) if abstain_correct else None,
                 "useful_answers": len(useful),
                 "cost_per_useful_answer_usd": round(total_cost / len(useful), 6) if useful and total_cost else None,
             }
@@ -66,8 +72,11 @@ def format_table(rows: list[dict[str, Any]]) -> str:
         "errors",
         "avg_input_tokens",
         "avg_latency_s",
-        "avg_answer_score",
-        "avg_citation_score",
+        "avg_fact_coverage",
+        "avg_citation_precision",
+        "avg_citation_recall",
+        "avg_schema_ok",
+        "avg_abstain_correct",
         "avg_evidence_recall",
         "useful_answers",
     ]
@@ -80,11 +89,40 @@ def format_table(rows: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
-def _meta_float(record: dict[str, Any], key: str) -> float:
+def _meta_numbers(records: list[dict[str, Any]], key: str) -> list[float]:
+    values: list[float] = []
+    for record in records:
+        value = record.get("meta", {}).get(key)
+        if isinstance(value, bool):
+            values.append(1.0 if value else 0.0)
+        elif isinstance(value, int | float):
+            values.append(float(value))
+    return values
+
+
+def _meta_float(record: dict[str, Any], key: str) -> float | None:
     value = record.get("meta", {}).get(key, 0.0)
+    if isinstance(value, bool):
+        return 1.0 if value else 0.0
     if isinstance(value, int | float):
         return float(value)
-    return 0.0
+    return None
+
+
+def _is_useful(record: dict[str, Any]) -> bool:
+    fact_coverage = _meta_float(record, "fact_coverage")
+    citation_recall = _meta_float(record, "citation_recall")
+    schema_ok = record.get("meta", {}).get("schema_ok")
+    abstain_correct = record.get("meta", {}).get("abstain_correct")
+    if fact_coverage is None or fact_coverage < 0.7:
+        return False
+    if citation_recall is not None and citation_recall < 0.7:
+        return False
+    if schema_ok is False:
+        return False
+    if abstain_correct is False:
+        return False
+    return True
 
 
 def _record_cost(record: dict[str, Any]) -> float:

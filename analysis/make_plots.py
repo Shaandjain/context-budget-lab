@@ -47,15 +47,16 @@ def _svg(rows: list[dict[str, Any]]) -> str:
     for idx, row in enumerate(rows):
         y = 96 + idx * (bar_height + gap)
         latency = row.get("avg_latency_s") or 0.0
-        answer = row.get("avg_answer_score")
-        citation = row.get("avg_citation_score")
+        fact = row.get("avg_fact_coverage")
+        precision = row.get("avg_citation_precision")
+        recall = row.get("avg_citation_recall")
         evidence = row.get("avg_evidence_recall")
         bar_width = int((latency / max_latency) * 560) if max_latency else 0
         lines.extend(
             [
                 f'<text x="24" y="{y + 20}" font-family="Arial, sans-serif" font-size="13">{_escape(str(row["strategy"]))}</text>',
                 f'<rect x="{margin_left}" y="{y}" width="{max(2, bar_width)}" height="{bar_height}" fill="#2563eb"/>',
-                f'<text x="{margin_left + bar_width + 10}" y="{y + 19}" font-family="Arial, sans-serif" font-size="12" fill="#222">{latency:.3f}s  A:{answer} C:{citation} E:{evidence}</text>',
+                f'<text x="{margin_left + bar_width + 10}" y="{y + 19}" font-family="Arial, sans-serif" font-size="12" fill="#222">{latency:.3f}s  F:{fact} P:{precision} R:{recall} E:{evidence}</text>',
             ]
         )
     lines.append("</svg>")

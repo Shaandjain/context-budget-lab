@@ -85,14 +85,21 @@ def main(argv: list[str] | None = None) -> int:
                     "question": task["question"],
                     "retrieved_source_ids": selected_source_ids,
                     "gold_source_ids": task.get("gold_source_ids", []),
-                    "answer_score": _score_or_zero(scores["answer_keyword_score"]),
-                    "citation_score": _score_or_zero(scores["citation_source_score"]),
-                    "evidence_recall": _score_or_zero(scores["evidence_recall"]),
+                    "fact_coverage": scores["fact_coverage"],
+                    "citation_precision": scores["citation_precision"],
+                    "citation_recall": scores["citation_recall"],
+                    "evidence_recall": scores["evidence_recall"],
+                    "schema_ok": scores["schema_ok"],
+                    "abstain_correct": scores["abstain_correct"],
                     "prefix_cacheable_tokens": _prefix_cacheable_tokens(strategy_name, strategy_result["prompt"]),
                     "strategy_build_cost_usd": 0.0,
                     "strategy_metadata": strategy_meta,
-                    "matched_answer_keywords": score["matched_answer_keywords"],
+                    "matched_expected_facts": score["matched_expected_facts"],
                     "cited_source_ids": score["cited_source_ids"],
+                    "unknown_citation_ids": score["unknown_citation_ids"],
+                    "schema_errors": score["schema_errors"],
+                    "abstained": score["abstained"],
+                    "abstain_expected": score["abstain_expected"],
                     "answer_excerpt": answer[:400],
                 }
                 record = TraceRecord(
@@ -158,10 +165,6 @@ def _messages_text(messages: list[dict[str, str]]) -> str:
 
 def _messages_from_prompt(prompt: str) -> list[dict[str, str]]:
     return [{"role": "user", "content": prompt}]
-
-
-def _score_or_zero(value: float | None) -> float:
-    return 0.0 if value is None else float(value)
 
 
 def _prefix_cacheable_tokens(strategy_name: str, prompt: str) -> int:
