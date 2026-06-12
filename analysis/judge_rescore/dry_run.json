@@ -1,0 +1,14 @@
+{
+  "answer_text_source": "meta.answer_excerpt",
+  "estimated_worst_case_cost_usd": 2.963734,
+  "judge_model": "claude-haiku-4-5-20251001",
+  "max_tokens": 600,
+  "n_requests": 2200,
+  "n_unique_judge_cases_planned": 866,
+  "n_unique_judge_cases_total": 866,
+  "pricing": {
+    "input_usd_per_mtok": 1.0,
+    "output_usd_per_mtok": 5.0
+  },
+  "prompt_version": "fact-coverage-judge-v1"
+}

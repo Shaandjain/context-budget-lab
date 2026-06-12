@@ -1,6 +1,6 @@
-# Context Budget Lab v1 Results
+# Context Budget Lab Results
 
-Reproduce the v1 analysis from committed traces:
+Reproduce the committed local analyses:
 
 ```bash
 uv run python analysis/frontier.py results/local-matrix --out-dir analysis/frontier --resamples 1000 --seed 1729
@@ -10,13 +10,15 @@ uv run python benchmarks/export_workloads.py
 uv run pytest
 ```
 
+The A12 judge-calibration artifacts are committed under `analysis/judge_rescore/`. Re-running the judge from scratch requires `ANTHROPIC_API_KEY` and spends Anthropic API budget; the committed run used `claude-haiku-4-5-20251001` and spent $2.071164 total.
+
 ## Research Question
 
 Does the context-strategy frontier shift between `qwen2.5:3b` and `qwen2.5:7b`, what does streaming TTFT show once the client streams tokens, and is the prefix-cache abstention failure fixable with one explicit instruction?
 
 ## Setup
 
-All runs used local Ollama on an M3 Pro, temperature 0, seed 1729, public or synthetic datasets only, and deterministic scoring. No GPU, Modal, paid API, embedding model, new Python dependency, or LLM judge was used.
+The v1 model runs used local Ollama on an M3 Pro, temperature 0, seed 1729, public or synthetic datasets only, and deterministic scoring. No GPU, Modal, embedding model, or new Python dependency was used. A12 adds one paid Anthropic API judge calibration pass over saved traces only; it does not add new subject-model answers and does not judge citations.
 
 The cross-scale matrix uses the existing 3b v0 traces and the new 7b streaming traces under `results/local-matrix`. Each model/strategy condition has 200 records and 0 request errors. The 3b matrix predates the streaming client, so `analysis/frontier/summary.md` intentionally reports `n/a` for 3b TTFT/TPOT. The 7b rows and A8 variant rows have real streaming `ttft_s`, `tpot_s`, and decode-rate fields.
 
@@ -45,6 +47,21 @@ The v1 frontier used per-arm bootstrap CIs, but the design is paired: the same t
 | 3b `rag_topk` -> 7b `rag_topk` | citation precision | +0.095 [0.013, 0.177] | 7b citation gain separates under pairing | `analysis/paired_deltas/summary.md` |
 
 This sharpens the v1 takeaway. RAG top-k and full-context remain tied on measured fact coverage for both model scales. The memory-compression losses are now stronger evidence, because several comparisons that had overlapping per-arm CIs become paired separations. The 7b fact-coverage deficit remains close to zero rather than decisive, while 7b citation gains survive the paired design.
+
+## A12 Judge Calibration
+
+A12 re-scored fact coverage only with `claude-haiku-4-5-20251001`, temperature 0, prompt version `fact-coverage-judge-v1`. It deduped identical `(task, answer excerpt)` pairs before judging: 2,200 request rows collapsed to 866 unique judge calls. Outputs live in `analysis/judge_rescore/summary.md`, `analysis/judge_rescore/judge_scores.jsonl`, `analysis/judge_rescore/judge_disagreements.md`, and `analysis/judge_rescore/proposed_fact_aliases.md`.
+
+The judge broadly confirms that the literal scorer under-credits paraphrase. Judge fact coverage is higher than literal fact coverage for every strategy/model row, with deltas from +0.042 to +0.210. Per-fact agreement ranges from 0.764 to 0.883, and the sampled disagreements show exactly the expected failure mode: phrases like "people should know when automated systems are being used" credited for "interacting with an AI system," or "powerful dual-use models" credited for "dual-use foundation models."
+
+H2 remains **inconclusive**, not supported. Judge-scored 7b-minus-3b paired deltas are still slightly negative on the two pre-registered comparisons, but both CIs cross zero:
+
+| comparison | judge paired delta | H2 interpretation | source |
+| --- | --- | --- | --- |
+| 3b `full_context` -> 7b `full_context` | -0.021 [-0.105, +0.058] | inconclusive | `analysis/judge_rescore/summary.md` |
+| 3b `rag_topk` -> 7b `rag_topk` | -0.024 [-0.096, +0.047] | inconclusive | `analysis/judge_rescore/summary.md` |
+
+So the judge did fix part of the instrument problem, but it did not flip the scale result into "7b >= 3b" on fact coverage. The safest claim is: scaling improved citation discipline, and judge scoring reduces literal-match undercounting, but this workload still does not show a fact-coverage win from 7b. A12 API spend was $2.071164 total, including $0.647025 from an unrecovered first pass after fixing a non-global `request_id` collision in the score writer; the final score file has all 2,200 rows.
 
 ## Streaming Timing
 
@@ -77,9 +94,9 @@ This is a local quantized Ollama result, not a serving-infrastructure benchmark.
 
 Bootstrap confidence intervals in `analysis/frontier/summary.md` are over repeated task traces, not a guarantee about broader workloads. The task set is 40 controlled tasks split across public-policy and synthetic-memory lanes.
 
-The A11 paired reanalysis in `analysis/paired_deltas/summary.md` is stronger for within-task comparisons, but it does not fix the literal scorer limitation or add long-context budget pressure. Those are A12 and A13's jobs.
+The A11 paired reanalysis in `analysis/paired_deltas/summary.md` is stronger for within-task comparisons, but it does not add long-context budget pressure. That is A13's job.
 
-The scorer is deterministic and literal. It catches regressions consistently, but it will miss valid paraphrases and cannot judge reasoning quality beyond the expected facts/citations/schema checks.
+The deterministic scorer is literal. A12 shows that it misses valid paraphrases, but the judge is still only a calibration instrument over saved `answer_excerpt` fields, not full model answers and not ground truth. The judge does not evaluate citations, formatting, or reasoning quality beyond expected fact coverage.
 
 The workload exports remain producer-side task suites for `../inference-release-lab`; no record-format or schema change was made in v1.
 
@@ -89,6 +106,9 @@ The workload exports remain producer-side task suites for `../inference-release-
 - Cross-scale summary: `analysis/frontier/summary.md`
 - 7b-minus-3b deltas: `analysis/frontier/model_deltas.md`
 - Paired task-level deltas: `analysis/paired_deltas/summary.md`
+- Judge fact-coverage calibration: `analysis/judge_rescore/summary.md`
+- Judge disagreement sample: `analysis/judge_rescore/judge_disagreements.md`
+- Proposed fact aliases for review: `analysis/judge_rescore/proposed_fact_aliases.md`
 - Abstention experiment: `analysis/abstention_variant/summary.md`
 - Raw traces: `results/local-matrix/**/traces.jsonl` and `results/abstention-variant/**/traces.jsonl`
 - Workload exports: `exports/public_ai_policy_v0.jsonl`, `exports/synthetic_agent_memory_v0.jsonl`

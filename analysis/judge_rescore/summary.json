@@ -1,0 +1,208 @@
+{
+  "agreement_rows": [
+    {
+      "delta_judge_minus_literal": 0.05825,
+      "judge_credited_literal_missed": 80,
+      "judge_fact_coverage_mean": 0.843,
+      "literal_credited_judge_missed": 45,
+      "literal_fact_coverage_mean": 0.78475,
+      "model": "qwen2.5:3b",
+      "n_requests": 200,
+      "n_tasks": 40,
+      "n_unique_judge_cases": 64,
+      "per_fact_agreement": 0.84375,
+      "strategy": "full_context"
+    },
+    {
+      "delta_judge_minus_literal": 0.126667,
+      "judge_credited_literal_missed": 54,
+      "judge_fact_coverage_mean": 0.654167,
+      "literal_credited_judge_missed": 5,
+      "literal_fact_coverage_mean": 0.5275,
+      "model": "qwen2.5:3b",
+      "n_requests": 100,
+      "n_tasks": 20,
+      "n_unique_judge_cases": 29,
+      "per_fact_agreement": 0.846753,
+      "strategy": "prefix_cache_abstain"
+    },
+    {
+      "delta_judge_minus_literal": 0.128917,
+      "judge_credited_literal_missed": 102,
+      "judge_fact_coverage_mean": 0.859167,
+      "literal_credited_judge_missed": 6,
+      "literal_fact_coverage_mean": 0.73025,
+      "model": "qwen2.5:3b",
+      "n_requests": 200,
+      "n_tasks": 40,
+      "n_unique_judge_cases": 75,
+      "per_fact_agreement": 0.865,
+      "strategy": "prefix_cache_friendly"
+    },
+    {
+      "delta_judge_minus_literal": 0.082417,
+      "judge_credited_literal_missed": 102,
+      "judge_fact_coverage_mean": 0.849083,
+      "literal_credited_judge_missed": 46,
+      "literal_fact_coverage_mean": 0.766667,
+      "model": "qwen2.5:3b",
+      "n_requests": 200,
+      "n_tasks": 40,
+      "n_unique_judge_cases": 99,
+      "per_fact_agreement": 0.815,
+      "strategy": "rag_topk"
+    },
+    {
+      "delta_judge_minus_literal": 0.055333,
+      "judge_credited_literal_missed": 111,
+      "judge_fact_coverage_mean": 0.631667,
+      "literal_credited_judge_missed": 78,
+      "literal_fact_coverage_mean": 0.576333,
+      "model": "qwen2.5:3b",
+      "n_requests": 200,
+      "n_tasks": 40,
+      "n_unique_judge_cases": 81,
+      "per_fact_agreement": 0.76375,
+      "strategy": "structured_memory"
+    },
+    {
+      "delta_judge_minus_literal": 0.042333,
+      "judge_credited_literal_missed": 65,
+      "judge_fact_coverage_mean": 0.678583,
+      "literal_credited_judge_missed": 40,
+      "literal_fact_coverage_mean": 0.63625,
+      "model": "qwen2.5:3b",
+      "n_requests": 200,
+      "n_tasks": 40,
+      "n_unique_judge_cases": 74,
+      "per_fact_agreement": 0.86875,
+      "strategy": "summary_memory"
+    },
+    {
+      "delta_judge_minus_literal": 0.0975,
+      "judge_credited_literal_missed": 94,
+      "judge_fact_coverage_mean": 0.822083,
+      "literal_credited_judge_missed": 28,
+      "literal_fact_coverage_mean": 0.724583,
+      "model": "qwen2.5:7b",
+      "n_requests": 200,
+      "n_tasks": 40,
+      "n_unique_judge_cases": 73,
+      "per_fact_agreement": 0.8475,
+      "strategy": "full_context"
+    },
+    {
+      "delta_judge_minus_literal": 0.21,
+      "judge_credited_literal_missed": 77,
+      "judge_fact_coverage_mean": 0.766667,
+      "literal_credited_judge_missed": 0,
+      "literal_fact_coverage_mean": 0.556667,
+      "model": "qwen2.5:7b",
+      "n_requests": 100,
+      "n_tasks": 20,
+      "n_unique_judge_cases": 36,
+      "per_fact_agreement": 0.8,
+      "strategy": "prefix_cache_abstain"
+    },
+    {
+      "delta_judge_minus_literal": 0.08625,
+      "judge_credited_literal_missed": 90,
+      "judge_fact_coverage_mean": 0.819167,
+      "literal_credited_judge_missed": 33,
+      "literal_fact_coverage_mean": 0.732917,
+      "model": "qwen2.5:7b",
+      "n_requests": 200,
+      "n_tasks": 40,
+      "n_unique_judge_cases": 66,
+      "per_fact_agreement": 0.84625,
+      "strategy": "prefix_cache_friendly"
+    },
+    {
+      "delta_judge_minus_literal": 0.098083,
+      "judge_credited_literal_missed": 100,
+      "judge_fact_coverage_mean": 0.824917,
+      "literal_credited_judge_missed": 35,
+      "literal_fact_coverage_mean": 0.726833,
+      "model": "qwen2.5:7b",
+      "n_requests": 200,
+      "n_tasks": 40,
+      "n_unique_judge_cases": 80,
+      "per_fact_agreement": 0.83125,
+      "strategy": "rag_topk"
+    },
+    {
+      "delta_judge_minus_literal": 0.104167,
+      "judge_credited_literal_missed": 83,
+      "judge_fact_coverage_mean": 0.697083,
+      "literal_credited_judge_missed": 11,
+      "literal_fact_coverage_mean": 0.592917,
+      "model": "qwen2.5:7b",
+      "n_requests": 200,
+      "n_tasks": 40,
+      "n_unique_judge_cases": 100,
+      "per_fact_agreement": 0.8825,
+      "strategy": "structured_memory"
+    },
+    {
+      "delta_judge_minus_literal": 0.063333,
+      "judge_credited_literal_missed": 75,
+      "judge_fact_coverage_mean": 0.658,
+      "literal_credited_judge_missed": 32,
+      "literal_fact_coverage_mean": 0.594667,
+      "model": "qwen2.5:7b",
+      "n_requests": 200,
+      "n_tasks": 40,
+      "n_unique_judge_cases": 95,
+      "per_fact_agreement": 0.86625,
+      "strategy": "summary_memory"
+    }
+  ],
+  "answer_text_source": "meta.answer_excerpt",
+  "disagreement_count": 1392,
+  "h2": {
+    "delta": "qwen2.5:7b_minus_qwen2.5:3b",
+    "hypothesis": "H2: judge-scored fact coverage shows qwen2.5:7b >= qwen2.5:3b on full_context and rag_topk.",
+    "rows": [
+      {
+        "baseline_model": "qwen2.5:3b",
+        "comparison_model": "qwen2.5:7b",
+        "n_tasks": 40,
+        "paired_delta": {
+          "ci_high": 0.058333,
+          "ci_low": -0.104667,
+          "n": 40,
+          "value": -0.020917
+        },
+        "status": "inconclusive",
+        "strategy": "full_context"
+      },
+      {
+        "baseline_model": "qwen2.5:3b",
+        "comparison_model": "qwen2.5:7b",
+        "n_tasks": 40,
+        "paired_delta": {
+          "ci_high": 0.047,
+          "ci_low": -0.0955,
+          "n": 40,
+          "value": -0.024167
+        },
+        "status": "inconclusive",
+        "strategy": "rag_topk"
+      }
+    ],
+    "verdict": "inconclusive"
+  },
+  "judge_model": "claude-haiku-4-5-20251001",
+  "judge_scores_path": "analysis/judge_rescore/judge_scores.jsonl",
+  "n_requests": 2200,
+  "n_unique_judge_cases": 866,
+  "newly_judged_unique_cases": 0,
+  "pricing": {
+    "input_usd_per_mtok": 1.0,
+    "output_usd_per_mtok": 5.0
+  },
+  "prompt_version": "fact-coverage-judge-v1",
+  "score_file_cost_usd": 1.424139,
+  "total_cost_usd": 2.071164,
+  "unrecovered_prior_spend_usd": 0.647025
+}
