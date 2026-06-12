@@ -188,7 +188,7 @@ def _with_nonce(prompt: str, *, seed: int, repeat_index: int, request_id: str) -
 
 
 def _prefix_cacheable_tokens(strategy_name: str, prompt: str) -> int:
-    if strategy_name != "prefix_cache_friendly":
+    if strategy_name not in {"prefix_cache_friendly", "prefix_cache_abstain"}:
         return 0
     prefix = prompt.split("Payload:", 1)[0]
     return estimate_tokens(prefix)

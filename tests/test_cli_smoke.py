@@ -72,6 +72,31 @@ def test_cli_repeats_record_seed_in_run_and_trace(tmp_path: Path) -> None:
     assert ":r0:" in first["request_id"]
 
 
+def test_cli_records_prefix_abstain_variant_metadata(tmp_path: Path) -> None:
+    assert (
+        main(
+            [
+                "--mock",
+                "--limit",
+                "1",
+                "--datasets",
+                "synthetic_agent_memory_v0",
+                "--strategies",
+                "prefix_cache_abstain",
+                "--out",
+                str(tmp_path),
+            ]
+        )
+        == 0
+    )
+
+    run_dir = next(tmp_path.iterdir())
+    first = json.loads((run_dir / "traces.jsonl").read_text(encoding="utf-8").splitlines()[0])
+    assert first["strategy"] == "prefix_cache_abstain"
+    assert first["meta"]["prefix_cacheable_tokens"] > 0
+    assert first["meta"]["strategy_metadata"]["variant"] == "explicit_insufficient_context_instruction"
+
+
 def test_run_matrix_writes_condition_summary_and_plot(tmp_path: Path) -> None:
     assert (
         run_matrix(

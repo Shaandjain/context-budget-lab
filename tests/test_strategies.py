@@ -7,6 +7,7 @@ from context_budget_lab.strategies import (
     build_all_strategy_prompts,
     build_strategy_prompt,
     full_context,
+    prefix_cache_abstain,
     prefix_cache_friendly,
     rag_topk,
     structured_memory,
@@ -94,6 +95,18 @@ def test_prefix_cache_friendly_keeps_stable_header_before_payload(sample_task: d
     assert result["metadata"]["cache_prefix"] == "context_budget_lab.v1"
 
 
+def test_prefix_cache_abstain_only_changes_stable_instruction(sample_task: dict[str, object]) -> None:
+    baseline = prefix_cache_friendly(sample_task, top_k=1)
+    result = prefix_cache_abstain(sample_task, top_k=1)
+
+    assert result["strategy"] == "prefix_cache_abstain"
+    assert result["source_ids"] == baseline["source_ids"]
+    assert result["metadata"]["cache_prefix"] == "context_budget_lab.v1.abstain"
+    assert result["metadata"]["variant"] == "explicit_insufficient_context_instruction"
+    assert "does not contain enough information" in result["prompt"].split("Payload:", 1)[0]
+    assert result["prompt"].split("Payload:", 1)[1] == baseline["prompt"].split("Payload:", 1)[1]
+
+
 def test_strategy_dispatch_covers_all_registered_strategies(sample_task: dict[str, object]) -> None:
     assert list(STRATEGIES) == [
         "full_context",
@@ -101,6 +114,7 @@ def test_strategy_dispatch_covers_all_registered_strategies(sample_task: dict[st
         "summary_memory",
         "structured_memory",
         "prefix_cache_friendly",
+        "prefix_cache_abstain",
     ]
 
     results = build_all_strategy_prompts(sample_task, top_k=2)

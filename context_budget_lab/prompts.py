@@ -25,6 +25,19 @@ PREFIX_CACHE_HEADER = "\n".join(
     ]
 )
 
+PREFIX_CACHE_ABSTAIN_HEADER = "\n".join(
+    [
+        "You are running the context-budget-lab benchmark.",
+        "Rules:",
+        "- Use only the request-specific evidence below.",
+        "- If the evidence does not contain enough information to answer, say that it is insufficient instead of guessing.",
+        "- Cite source ids in square brackets when source-backed evidence is used.",
+        "- Keep the answer concise and explicit.",
+        "",
+        "The request-specific payload begins after this line.",
+    ]
+)
+
 
 def question(task: Task) -> str:
     value = task.get("question", "")
@@ -121,10 +134,10 @@ def build_standard_prompt(
     )
 
 
-def build_prefix_cache_prompt(task: Task, evidence_body: str) -> str:
+def build_prefix_cache_prompt(task: Task, evidence_body: str, *, header: str = PREFIX_CACHE_HEADER) -> str:
     return "\n\n".join(
         [
-            PREFIX_CACHE_HEADER,
+            header,
             "Payload:",
             f"Question:\n{question(task)}",
             f"Evidence:\n{evidence_body}",

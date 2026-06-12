@@ -8,6 +8,7 @@ from typing import Any
 from context_budget_lab.prompts import (
     Task,
     Source,
+    PREFIX_CACHE_ABSTAIN_HEADER,
     build_prefix_cache_prompt,
     build_standard_prompt,
     format_sources,
@@ -120,6 +121,23 @@ def prefix_cache_friendly(task: Task, *, top_k: int = 3) -> StrategyResult:
     )
 
 
+def prefix_cache_abstain(task: Task, *, top_k: int = 3) -> StrategyResult:
+    selected = rank_sources(task)[:top_k]
+    return _result(
+        task=task,
+        strategy="prefix_cache_abstain",
+        prompt=build_prefix_cache_prompt(task, format_sources(selected), header=PREFIX_CACHE_ABSTAIN_HEADER),
+        selected_sources=selected,
+        metadata={
+            "retrieval": "lexical_overlap",
+            "top_k": top_k,
+            "source_count": len(selected),
+            "cache_prefix": "context_budget_lab.v1.abstain",
+            "variant": "explicit_insufficient_context_instruction",
+        },
+    )
+
+
 def build_strategy_prompt(task: Task, strategy: str, *, top_k: int = 3) -> StrategyResult:
     if strategy == "full_context":
         return full_context(task)
@@ -131,6 +149,8 @@ def build_strategy_prompt(task: Task, strategy: str, *, top_k: int = 3) -> Strat
         return structured_memory(task)
     if strategy == "prefix_cache_friendly":
         return prefix_cache_friendly(task, top_k=top_k)
+    if strategy == "prefix_cache_abstain":
+        return prefix_cache_abstain(task, top_k=top_k)
     raise ValueError(f"unknown strategy: {strategy}")
 
 
@@ -233,4 +253,5 @@ STRATEGIES: dict[str, Callable[..., StrategyResult]] = {
     "summary_memory": summary_memory,
     "structured_memory": structured_memory,
     "prefix_cache_friendly": prefix_cache_friendly,
+    "prefix_cache_abstain": prefix_cache_abstain,
 }
