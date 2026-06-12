@@ -1,0 +1,332 @@
+[
+  {
+    "errors": 0,
+    "metrics": {
+      "abstain_correct": {
+        "ci_high": 0.966667,
+        "ci_low": 0.7,
+        "n": 30,
+        "value": 0.833333
+      },
+      "citation_precision": {
+        "ci_high": 0.680833,
+        "ci_low": 0.556667,
+        "n": 200,
+        "value": 0.619167
+      },
+      "citation_recall": {
+        "ci_high": 0.9,
+        "ci_low": 0.794118,
+        "n": 170,
+        "value": 0.847059
+      },
+      "fact_coverage": {
+        "ci_high": 0.827083,
+        "ci_low": 0.73775,
+        "n": 200,
+        "value": 0.78475
+      },
+      "input_tokens_mean": {
+        "ci_high": 294.285,
+        "ci_low": 282.51,
+        "n": 200,
+        "value": 288.325
+      },
+      "latency_p50_s": {
+        "ci_high": 2.209127,
+        "ci_low": 2.002938,
+        "n": 200,
+        "value": 2.065289
+      },
+      "latency_p95_s": {
+        "ci_high": 4.235768,
+        "ci_low": 4.030921,
+        "n": 200,
+        "value": 4.156079
+      },
+      "output_tokens_mean": {
+        "ci_high": 107.675,
+        "ci_low": 94.635,
+        "n": 200,
+        "value": 101.345
+      },
+      "schema_ok": {
+        "ci_high": 0.825,
+        "ci_low": 0.705,
+        "n": 200,
+        "value": 0.77
+      }
+    },
+    "model": "qwen2.5:3b",
+    "n": 200,
+    "repeats": 5,
+    "run_dir": "results/local-matrix/qwen2-5-3b/full_context/context-budget-20260612-020245",
+    "seed": 1729,
+    "source": "live",
+    "strategy": "full_context"
+  },
+  {
+    "errors": 0,
+    "metrics": {
+      "abstain_correct": {
+        "ci_high": 0.2,
+        "ci_low": 0.0,
+        "n": 30,
+        "value": 0.1
+      },
+      "citation_precision": {
+        "ci_high": 0.670412,
+        "ci_low": 0.532772,
+        "n": 178,
+        "value": 0.599251
+      },
+      "citation_recall": {
+        "ci_high": 0.752941,
+        "ci_low": 0.617647,
+        "n": 170,
+        "value": 0.682353
+      },
+      "fact_coverage": {
+        "ci_high": 0.771667,
+        "ci_low": 0.68725,
+        "n": 200,
+        "value": 0.73025
+      },
+      "input_tokens_mean": {
+        "ci_high": 309.765,
+        "ci_low": 299.925,
+        "n": 200,
+        "value": 304.775
+      },
+      "latency_p50_s": {
+        "ci_high": 2.04484,
+        "ci_low": 1.871944,
+        "n": 200,
+        "value": 1.919888
+      },
+      "latency_p95_s": {
+        "ci_high": 3.824288,
+        "ci_low": 3.001225,
+        "n": 200,
+        "value": 3.172258
+      },
+      "output_tokens_mean": {
+        "ci_high": 79.28,
+        "ci_low": 70.08,
+        "n": 200,
+        "value": 74.64
+      },
+      "schema_ok": {
+        "ci_high": 0.79,
+        "ci_low": 0.665,
+        "n": 200,
+        "value": 0.73
+      }
+    },
+    "model": "qwen2.5:3b",
+    "n": 200,
+    "repeats": 5,
+    "run_dir": "results/local-matrix/qwen2-5-3b/prefix_cache_friendly/context-budget-20260612-023800",
+    "seed": 1729,
+    "source": "live",
+    "strategy": "prefix_cache_friendly"
+  },
+  {
+    "errors": 0,
+    "metrics": {
+      "abstain_correct": {
+        "ci_high": 0.833333,
+        "ci_low": 0.5,
+        "n": 30,
+        "value": 0.666667
+      },
+      "citation_precision": {
+        "ci_high": 0.664992,
+        "ci_low": 0.554104,
+        "n": 199,
+        "value": 0.60871
+      },
+      "citation_recall": {
+        "ci_high": 0.952941,
+        "ci_low": 0.870588,
+        "n": 170,
+        "value": 0.911765
+      },
+      "fact_coverage": {
+        "ci_high": 0.810167,
+        "ci_low": 0.72025,
+        "n": 200,
+        "value": 0.766667
+      },
+      "input_tokens_mean": {
+        "ci_high": 291.38,
+        "ci_low": 282.07,
+        "n": 200,
+        "value": 286.775
+      },
+      "latency_p50_s": {
+        "ci_high": 3.028232,
+        "ci_low": 2.482727,
+        "n": 200,
+        "value": 2.740511
+      },
+      "latency_p95_s": {
+        "ci_high": 4.189552,
+        "ci_low": 4.038097,
+        "n": 200,
+        "value": 4.140175
+      },
+      "output_tokens_mean": {
+        "ci_high": 125.555,
+        "ci_low": 114.9,
+        "n": 200,
+        "value": 120.025
+      },
+      "schema_ok": {
+        "ci_high": 0.86,
+        "ci_low": 0.75,
+        "n": 200,
+        "value": 0.81
+      }
+    },
+    "model": "qwen2.5:3b",
+    "n": 200,
+    "repeats": 5,
+    "run_dir": "results/local-matrix/qwen2-5-3b/rag_topk/context-budget-20260612-021101",
+    "seed": 1729,
+    "source": "live",
+    "strategy": "rag_topk"
+  },
+  {
+    "errors": 0,
+    "metrics": {
+      "abstain_correct": {
+        "ci_high": 0.333333,
+        "ci_low": 0.104167,
+        "n": 48,
+        "value": 0.208333
+      },
+      "citation_precision": {
+        "ci_high": 0.613636,
+        "ci_low": 0.502104,
+        "n": 198,
+        "value": 0.560606
+      },
+      "citation_recall": {
+        "ci_high": 0.941176,
+        "ci_low": 0.852941,
+        "n": 170,
+        "value": 0.9
+      },
+      "fact_coverage": {
+        "ci_high": 0.617917,
+        "ci_low": 0.535167,
+        "n": 200,
+        "value": 0.576333
+      },
+      "input_tokens_mean": {
+        "ci_high": 269.915,
+        "ci_low": 261.345,
+        "n": 200,
+        "value": 265.675
+      },
+      "latency_p50_s": {
+        "ci_high": 2.561781,
+        "ci_low": 2.267946,
+        "n": 200,
+        "value": 2.376532
+      },
+      "latency_p95_s": {
+        "ci_high": 4.630177,
+        "ci_low": 4.044149,
+        "n": 200,
+        "value": 4.51571
+      },
+      "output_tokens_mean": {
+        "ci_high": 114.555,
+        "ci_low": 102.33,
+        "n": 200,
+        "value": 108.245
+      },
+      "schema_ok": {
+        "ci_high": 0.945,
+        "ci_low": 0.865,
+        "n": 200,
+        "value": 0.905
+      }
+    },
+    "model": "qwen2.5:3b",
+    "n": 200,
+    "repeats": 5,
+    "run_dir": "results/local-matrix/qwen2-5-3b/structured_memory/context-budget-20260612-022855",
+    "seed": 1729,
+    "source": "live",
+    "strategy": "structured_memory"
+  },
+  {
+    "errors": 0,
+    "metrics": {
+      "abstain_correct": {
+        "ci_high": 0.8,
+        "ci_low": 0.485714,
+        "n": 35,
+        "value": 0.657143
+      },
+      "citation_precision": {
+        "ci_high": 0.626289,
+        "ci_low": 0.511168,
+        "n": 194,
+        "value": 0.571306
+      },
+      "citation_recall": {
+        "ci_high": 0.894118,
+        "ci_low": 0.782353,
+        "n": 170,
+        "value": 0.841176
+      },
+      "fact_coverage": {
+        "ci_high": 0.677917,
+        "ci_low": 0.596333,
+        "n": 200,
+        "value": 0.63625
+      },
+      "input_tokens_mean": {
+        "ci_high": 242.355,
+        "ci_low": 234.515,
+        "n": 200,
+        "value": 238.275
+      },
+      "latency_p50_s": {
+        "ci_high": 2.668422,
+        "ci_low": 2.079993,
+        "n": 200,
+        "value": 2.479787
+      },
+      "latency_p95_s": {
+        "ci_high": 3.984451,
+        "ci_low": 3.848558,
+        "n": 200,
+        "value": 3.9032
+      },
+      "output_tokens_mean": {
+        "ci_high": 120.47,
+        "ci_low": 108.005,
+        "n": 200,
+        "value": 114.37
+      },
+      "schema_ok": {
+        "ci_high": 0.905,
+        "ci_low": 0.81,
+        "n": 200,
+        "value": 0.86
+      }
+    },
+    "model": "qwen2.5:3b",
+    "n": 200,
+    "repeats": 5,
+    "run_dir": "results/local-matrix/qwen2-5-3b/summary_memory/context-budget-20260612-022024",
+    "seed": 1729,
+    "source": "live",
+    "strategy": "summary_memory"
+  }
+]

@@ -1,0 +1,61 @@
+# Context Budget Lab v0 Results
+
+Reproduce the v0 analysis from committed traces:
+
+```bash
+uv run python analysis/frontier.py results/local-matrix --out-dir analysis/frontier --resamples 1000 --seed 1729
+```
+
+## Research Question
+
+For citation-QA and synthetic agent-memory workloads on a small local model, which context strategy gives the best quality-latency-cost frontier: full context, lexical RAG top-k, summary memory, structured memory, or prefix-cache-friendly prompting?
+
+## Setup
+
+The v0 run used local Ollama on an M3 Pro with `qwen2.5:3b`, temperature 0, seed 1729, 40 tasks, 5 repeats, and 5 strategies for 1,000 live requests. The committed trace directories under `results/local-matrix/qwen2-5-3b/*/context-budget-20260612-*` each contain 200 records and 0 request errors; the bootstrap summary in `analysis/frontier/summary.json` is generated from those traces.
+
+No GPU, Modal, paid API, embeddings, or LLM judge was used. Cost is prompt-token proxy only in v0.
+
+## Summary Table
+
+Generated from `analysis/frontier/summary.md`:
+
+| model | strategy | n | errors | fact coverage | citation precision | citation recall | schema ok | abstain correct | p50 latency s | mean input tokens | source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| qwen2.5:3b | full_context | 200 | 0 | 0.785 [0.738, 0.827] | 0.619 [0.557, 0.681] | 0.847 [0.794, 0.900] | 0.770 [0.705, 0.825] | 0.833 [0.700, 0.967] | 2.065 [2.003, 2.209] | 288.325 [282.510, 294.285] | `results/local-matrix/qwen2-5-3b/full_context/context-budget-20260612-020245` |
+| qwen2.5:3b | prefix_cache_friendly | 200 | 0 | 0.730 [0.687, 0.772] | 0.599 [0.533, 0.670] | 0.682 [0.618, 0.753] | 0.730 [0.665, 0.790] | 0.100 [0.000, 0.200] | 1.920 [1.872, 2.045] | 304.775 [299.925, 309.765] | `results/local-matrix/qwen2-5-3b/prefix_cache_friendly/context-budget-20260612-023800` |
+| qwen2.5:3b | rag_topk | 200 | 0 | 0.767 [0.720, 0.810] | 0.609 [0.554, 0.665] | 0.912 [0.871, 0.953] | 0.810 [0.750, 0.860] | 0.667 [0.500, 0.833] | 2.741 [2.483, 3.028] | 286.775 [282.070, 291.380] | `results/local-matrix/qwen2-5-3b/rag_topk/context-budget-20260612-021101` |
+| qwen2.5:3b | structured_memory | 200 | 0 | 0.576 [0.535, 0.618] | 0.561 [0.502, 0.614] | 0.900 [0.853, 0.941] | 0.905 [0.865, 0.945] | 0.208 [0.104, 0.333] | 2.377 [2.268, 2.562] | 265.675 [261.345, 269.915] | `results/local-matrix/qwen2-5-3b/structured_memory/context-budget-20260612-022855` |
+| qwen2.5:3b | summary_memory | 200 | 0 | 0.636 [0.596, 0.678] | 0.571 [0.511, 0.626] | 0.841 [0.782, 0.894] | 0.860 [0.810, 0.905] | 0.657 [0.486, 0.800] | 2.480 [2.080, 2.668] | 238.275 [234.515, 242.355] | `results/local-matrix/qwen2-5-3b/summary_memory/context-budget-20260612-022024` |
+
+## Findings
+
+Full context had the highest fact coverage at 0.785 [0.738, 0.827] from `analysis/frontier/summary.json`, but it is indistinguishable from RAG top-k at this N because RAG fact coverage was 0.767 [0.720, 0.810] from `analysis/frontier/summary.json`.
+
+RAG top-k had the best citation recall at 0.912 [0.871, 0.953] from `analysis/frontier/summary.json`, while full context was 0.847 [0.794, 0.900] from `analysis/frontier/summary.json`.
+
+Prefix-cache-friendly prompting had the fastest p50 latency at 1.920s [1.872, 2.045] from `analysis/frontier/summary.json`, but its citation recall was lower at 0.682 [0.618, 0.753] and its abstention correctness was only 0.100 [0.000, 0.200] from `analysis/frontier/summary.json`.
+
+Summary memory reduced mean input tokens to 238.275 [234.515, 242.355] from `analysis/frontier/summary.json`, but fact coverage dropped to 0.636 [0.596, 0.678].
+
+Structured memory had the best schema compliance at 0.905 [0.865, 0.945] from `analysis/frontier/summary.json`, but it lost too much answer content: fact coverage was 0.576 [0.535, 0.618].
+
+## Negative Results / Surprises
+
+The memory strategies cited often enough to look superficially credible, but they lost required facts. This repeats the week-3 warning: citation quality and answer quality must stay separate.
+
+Prefix-cache-friendly prompting was fastest in this local run but failed many missing-memory questions. The current prompt shape appears to encourage an answer even when the memory is insufficient.
+
+Lexical RAG did not beat full context on latency in the local Ollama run. Its p50 latency was 2.741s [2.483, 3.028] from `analysis/frontier/summary.json`, slower than full context at 2.065s [2.003, 2.209], likely because answer length and local serving variance dominate prompt length at this scale.
+
+## Limitations
+
+This is a small local-model result, not a serving-infrastructure result. Non-streaming Ollama records observable request latency as TTFT, so TTFT/TBT conclusions should not be drawn from this v0.
+
+The retrieval baseline is lexical top-k over task-local context, not embeddings. The scoring is deterministic literal matching, so it intentionally misses valid paraphrases.
+
+All public-policy snippets are self-written summaries of public sources rather than full-document retrieval. The synthetic memory lane is useful for controlled behavior, not a claim about real user memory distribution.
+
+## Frontier Chart
+
+`analysis/frontier/frontier.svg` plots fact coverage against p50 latency with point size as mean prompt tokens. The chart is generated from `analysis/frontier/summary.json`.
