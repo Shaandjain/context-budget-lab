@@ -47,7 +47,8 @@ codex-B owns local Ollama for its deferred live phase-2 queue (B8/B9/B10). A11 a
 - Expand abstention tasks to ~20 (same rule: answer genuinely absent from memory), so abstention CIs stop being [0, 0.2]-wide.
 - Run matrix: strategies {`full_context`, `rag_topk`, `summary_memory`, `structured_memory`} × sizes {2, 8, 32} × both models × repeats 3 (repeats are for latency; quality is paired over tasks). Skip the prefix-cache lane — its question (abstention/caching) is separate from the budget question.
 - The 7b×32-doc cells will be slow on the M3 Pro — run one condition at a time, commit summaries + one example trace dir as you go, and ledger-log progress so wall-clock stalls are visible. If a full cell exceeds ~2h, halve repeats for that cell and say so.
-- If alias list was approved by then, scorer uses it (aliases live next to datasets, versioned); otherwise run with v1 scorer and note it.
+- **Alias list REJECTED (2026-06-14, see decisions.md): run A13 on the v1 deterministic scorer.** Do not wire `proposed_fact_aliases.md` into `scoring.py`. Report judge fact-coverage as a separate column beside the literal column where relevant; the literal/judge gap is the calibration finding, not a scorer patch. If the morphology fix below lands first, use that scorer version and label it.
+- Optional separate milestone (not the alias table): fix the literal matcher's morphology/word-order brittleness (`benchmark` not matching `benchmarks`, `responsible use guidance` vs `guidance on responsible use`) as a *general* normalization rule applied to all tasks, with gold **and negative** tests, then re-run and report literal-v2 vs literal-v1 vs judge. Reproducible; the curated per-answer alias list is not.
 - Analysis: paired deltas everywhere; per-metric curves vs haystack size; the Pareto-crossing chart; H1/H3 verdicts with CIs.
 
 ### A14 — Optional API-subject anchor (~$2–4, within the same $10 cap)
