@@ -40,6 +40,33 @@ def test_openai_compat_client_streams_ttft_and_tpot(monkeypatch) -> None:  # typ
     assert round(result.tpot_s or 0.0, 3) == 0.075
 
 
+def _capture_request_headers(monkeypatch, client: OpenAICompatClient) -> dict[str, str]:  # type: ignore[no-untyped-def]
+    captured: dict[str, str] = {}
+
+    def fake_urlopen(req, *args, **kwargs):  # type: ignore[no-untyped-def]
+        captured.update(req.headers)
+        return FakeResponse()
+
+    monkeypatch.setattr(client_module.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(client_module.time, "perf_counter", lambda: 0.0)
+    client.complete([{"role": "user", "content": "hi"}], max_tokens=4, temperature=0.0)
+    return captured
+
+
+def test_sends_bearer_auth_header_when_api_key_set(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    client = OpenAICompatClient("https://remote/v1", "qwen2.5-7b-instruct", api_key="secret-key")
+    headers = _capture_request_headers(monkeypatch, client)
+    # urllib title-cases header keys.
+    assert headers.get("Authorization") == "Bearer secret-key"
+
+
+def test_no_auth_header_without_key(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    monkeypatch.delenv("CBL_API_KEY", raising=False)
+    client = OpenAICompatClient("http://localhost:11434/v1", "qwen2.5:3b")
+    headers = _capture_request_headers(monkeypatch, client)
+    assert "Authorization" not in headers  # negative case: local Ollama unaffected
+
+
 def test_mock_client_simulates_distinct_ttft_and_latency() -> None:
     result = MockClient().complete(
         [{"role": "user", "content": "Question:\nWhat happened?\nSource:\n[S1] Example."}],

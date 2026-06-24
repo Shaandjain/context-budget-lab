@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import json
+import os
 import time
 from typing import Protocol
 from urllib import error, request
@@ -36,10 +37,19 @@ class ChatClient(Protocol):
 class OpenAICompatClient:
     """Minimal streaming `/v1/chat/completions` client for local OpenAI-compatible APIs."""
 
-    def __init__(self, base_url: str, model: str, timeout_s: float = 120.0) -> None:
+    def __init__(
+        self,
+        base_url: str,
+        model: str,
+        timeout_s: float = 120.0,
+        api_key: str | None = None,
+    ) -> None:
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.timeout_s = timeout_s
+        # Remote vLLM (Modal) is served with --api-key; local Ollama needs none.
+        # Falls back to env so the key never has to appear on the command line.
+        self.api_key = api_key or os.environ.get("CBL_API_KEY")
 
     def complete(
         self,
@@ -56,10 +66,13 @@ class OpenAICompatClient:
             "stream": True,
         }
         body = json.dumps(payload).encode("utf-8")
+        headers = {"Content-Type": "application/json"}
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
         req = request.Request(
             f"{self.base_url}/chat/completions",
             data=body,
-            headers={"Content-Type": "application/json"},
+            headers=headers,
             method="POST",
         )
 
