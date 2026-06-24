@@ -28,9 +28,13 @@ from context_budget_lab.haystack import HAYSTACK_SIZES, build_haystack_dataset
 
 
 # Base lanes -> v2 dataset-id stem. Variants are "<stem>_h{N}".
+# The abstain suite is itself a v2 source (built by build_abstention.py) and is
+# also swept across haystack sizes so abstention can be tested under context
+# pressure; run build_abstention.py before this script.
 BASE_LANES: dict[str, str] = {
     "public_ai_policy_v0": "public_ai_policy_v2",
     "synthetic_agent_memory_v0": "synthetic_agent_memory_v2",
+    "synthetic_agent_memory_abstain_v2": "synthetic_agent_memory_abstain_v2",
 }
 
 
