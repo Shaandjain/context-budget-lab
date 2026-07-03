@@ -4,7 +4,12 @@ import json
 from pathlib import Path
 from typing import Any
 
-from benchmarks.export_workloads import DEFAULT_EXPORT_DATASETS, export_workloads, task_to_workload_record
+from benchmarks.export_workloads import (
+    DEFAULT_EXPORT_DATASETS,
+    V2_LONG_CONTEXT_EXPORT_DATASETS,
+    export_workloads,
+    task_to_workload_record,
+)
 from context_budget_lab.datasets import load_dataset
 
 
@@ -51,15 +56,34 @@ def test_export_workloads_writes_jsonl_files(tmp_path: Path) -> None:
             validate_export_record(record)
 
 
+def test_export_workloads_writes_v2_long_context_files(tmp_path: Path) -> None:
+    written = export_workloads(list(V2_LONG_CONTEXT_EXPORT_DATASETS), out_dir=tmp_path)
+
+    assert {path.name for path in written} == {
+        "public_ai_policy_v2_h32.jsonl",
+        "synthetic_agent_memory_v2_h32.jsonl",
+        "synthetic_agent_memory_abstain_v2_h32.jsonl",
+    }
+    for path in written:
+        records = _read_jsonl(path)
+        assert len(records) == 20
+        assert all(record["metadata"]["haystack_size"] == 32 for record in records)
+        for record in records:
+            validate_export_record(record)
+
+
 def test_committed_exports_are_valid_if_present() -> None:
     export_dir = Path("exports")
     if not export_dir.exists():
         return
 
     task_ids: set[str] = set()
-    for dataset_id in DEFAULT_EXPORT_DATASETS:
+    for dataset_id in [*DEFAULT_EXPORT_DATASETS, *V2_LONG_CONTEXT_EXPORT_DATASETS]:
         path = export_dir / f"{dataset_id}.jsonl"
-        assert path.exists()
+        if dataset_id in DEFAULT_EXPORT_DATASETS:
+            assert path.exists()
+        elif not path.exists():
+            continue
         records = _read_jsonl(path)
         assert len(records) == 20
         for record in records:

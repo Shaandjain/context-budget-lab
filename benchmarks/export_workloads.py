@@ -16,6 +16,11 @@ from context_budget_lab.datasets import BenchmarkTask, DATASET_FILES, load_datas
 
 
 DEFAULT_EXPORT_DATASETS = ["public_ai_policy_v0", "synthetic_agent_memory_v0"]
+V2_LONG_CONTEXT_EXPORT_DATASETS = [
+    "public_ai_policy_v2_h32",
+    "synthetic_agent_memory_v2_h32",
+    "synthetic_agent_memory_abstain_v2_h32",
+]
 
 
 def main(argv: list[str] | None = None) -> int:

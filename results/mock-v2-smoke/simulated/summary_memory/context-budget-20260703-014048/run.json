@@ -1,0 +1,37 @@
+{
+  "config": {
+    "base_url": "http://localhost:11434/v1",
+    "datasets": [
+      "public_ai_policy_v2_h2",
+      "public_ai_policy_v2_h8",
+      "public_ai_policy_v2_h32",
+      "synthetic_agent_memory_v2_h2",
+      "synthetic_agent_memory_v2_h8",
+      "synthetic_agent_memory_v2_h32",
+      "synthetic_agent_memory_abstain_v2_h2",
+      "synthetic_agent_memory_abstain_v2_h8",
+      "synthetic_agent_memory_abstain_v2_h32"
+    ],
+    "limit": null,
+    "max_tokens": 180,
+    "mock": true,
+    "model": "qwen2.5-3b-instruct",
+    "repeats": 1,
+    "seed": 1729,
+    "strategies": [
+      "summary_memory"
+    ],
+    "temperature": 0.0
+  },
+  "created_at": "2026-07-03T01:40:48.516438+00:00",
+  "environment": {
+    "machine": "m3-pro-local",
+    "notes": "local-first Project 2 smoke"
+  },
+  "git_commit": "c0694117791dd57634b33e6596252639eb2310be",
+  "n_requests": 180,
+  "repo": "context-budget-lab",
+  "run_id": "context-budget-20260703-014048",
+  "schema_version": "0.1",
+  "source": "sim"
+}

@@ -48,6 +48,14 @@ Required fields are validated by `context_budget_lab.datasets`.
   public agent/retrieval papers. Use this to test preference recall, state
   recall, conflict resolution, and explicit "memory does not contain this"
   abstention without private data.
+- `*_v2_h{2,8,32}.jsonl`: A13 haystack-size variants generated from the v0
+  tasks. Gold documents are always retained. The h32 variants use non-answering
+  distractors pooled across the policy and synthetic-memory lanes because the
+  original same-lane corpora do not contain enough unique documents for true
+  32-document haystacks.
+- `synthetic_agent_memory_abstain_v2*.jsonl`: dedicated 20-task abstention suite
+  and its haystack variants. These questions ask for information genuinely
+  absent from the synthetic-memory corpus.
 
 ## Source Rules
 
