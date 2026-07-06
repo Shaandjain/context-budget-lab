@@ -12,6 +12,49 @@ uv run pytest
 
 The A12 judge-calibration artifacts are committed under `analysis/judge_rescore/`. Re-running the judge from scratch requires `ANTHROPIC_API_KEY` and spends Anthropic API budget; the committed run used `claude-haiku-4-5-20251001` and spent $2.071164 total.
 
+Reproduce the A13 v2 Modal analysis:
+
+```bash
+uv run python analysis/v2_sweep.py results/v2-matrix --out-dir analysis/v2_sweep --resamples 1000 --seed 1729
+```
+
+## Latest: A13 v2 Modal Sweep
+
+A13 is the first version of this lab that actually stresses the context budget. It runs both `qwen2.5-3b-instruct` and `qwen2.5-7b-instruct` on Modal L4 over nine v2 datasets: policy, memory, and abstention tasks at h2, h8, and h32 haystack sizes. Each final model/strategy condition has 540 traces and zero request errors. The analyzer reports `Clean matrix: True` in `analysis/v2_sweep/summary.md`.
+
+One 7B `structured_memory` attempt hit transient connection reset/read-timeout errors on a single h32 memory case and is archived under `results/v2-matrix-interrupted-modal-transient-20260706/`. It is not part of final analysis; the clean rerun is `results/v2-matrix/qwen2-5-7b-instruct/structured_memory/context-budget-20260706-223401`.
+
+| model | strategy | traces | errors | fact coverage | abstain correct | avg latency s | avg input tokens | useful answers | source |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `qwen2.5-3b-instruct` | `full_context` | 540 | 0 | 0.554 | 0.865 | 4.9711 | 999.03 | 169 | `results/v2-matrix/qwen2-5-3b-instruct/full_context/context-budget-20260703-022226/summary.json` |
+| `qwen2.5-3b-instruct` | `rag_topk` | 540 | 0 | 0.596 | 0.397 | 4.9070 | 288.08 | 216 | `results/v2-matrix/qwen2-5-3b-instruct/rag_topk/context-budget-20260703-030945/summary.json` |
+| `qwen2.5-3b-instruct` | `summary_memory` | 540 | 0 | 0.589 | 0.862 | 3.0786 | 671.99 | 92 | `results/v2-matrix/qwen2-5-3b-instruct/summary_memory/context-budget-20260706-172537/summary.json` |
+| `qwen2.5-3b-instruct` | `structured_memory` | 540 | 0 | 0.479 | 0.332 | 3.3169 | 750.26 | 89 | `results/v2-matrix/qwen2-5-3b-instruct/structured_memory/context-budget-20260706-175353/summary.json` |
+| `qwen2.5-7b-instruct` | `full_context` | 540 | 0 | 0.579 | 0.895 | 5.0369 | 999.03 | 221 | `results/v2-matrix/qwen2-5-7b-instruct/full_context/context-budget-20260706-182714/summary.json` |
+| `qwen2.5-7b-instruct` | `rag_topk` | 540 | 0 | 0.576 | 0.850 | 5.5955 | 288.08 | 197 | `results/v2-matrix/qwen2-5-7b-instruct/rag_topk/context-budget-20260706-191451/summary.json` |
+| `qwen2.5-7b-instruct` | `summary_memory` | 540 | 0 | 0.611 | 0.900 | 5.7753 | 671.99 | 95 | `results/v2-matrix/qwen2-5-7b-instruct/summary_memory/context-budget-20260706-200602/summary.json` |
+| `qwen2.5-7b-instruct` | `structured_memory` | 540 | 0 | 0.495 | 0.793 | 5.5537 | 750.26 | 104 | `results/v2-matrix/qwen2-5-7b-instruct/structured_memory/context-budget-20260706-223401/summary.json` |
+
+## A13 Hypothesis Verdicts
+
+**H1: RAG's fact-coverage advantage over full context increases with haystack size.** Inconclusive for both models. For 3B, RAG is directionally above full context at h2/h8/h32, but h32 is +0.029 with CI crossing zero. For 7B, the h32 delta is +0.011 with CI crossing zero. Source: `analysis/v2_sweep/summary.md`.
+
+**H2: the 7B fact-coverage deficit is a scoring artifact.** Still inconclusive from A12 judge calibration, not rescued by A13. The judge raised fact coverage across rows, confirming literal under-crediting, but judge-scored 7B-minus-3B paired deltas stayed slightly negative with CIs crossing zero for `full_context` and `rag_topk`. Source: `analysis/judge_rescore/summary.md`.
+
+**H3: compression strategies degrade faster with haystack size than RAG.** Supported for 7B `structured_memory`; inconclusive for 3B `structured_memory` and both `summary_memory` rows. The practical read is sharper than the formal trend test: `structured_memory` is consistently below RAG on fact coverage for both models, while `summary_memory` stays competitive and is the strongest compression candidate. Source: `analysis/v2_sweep/summary.md`.
+
+## A13 Frontier Read
+
+At h32, RAG gives the strongest token reduction: mean input tokens are about 312 versus 2,145 for full context on both models. But quality does not collapse for full context on these 32-document synthetic/public workloads, so there is no clean "full context crosses off the frontier" story yet.
+
+The clearest product-shaped result is that strategy choice is model-sensitive:
+
+- On 3B, `rag_topk` and `summary_memory` are the useful frontier strategies; full context is not Pareto-optimal at h2/h8/h32 in `analysis/v2_sweep/summary.md`.
+- On 7B, the frontier is flatter because latency and quality are close across several strategies. `summary_memory` has the best aggregate fact coverage and abstention correctness, but fewer useful answers than full context or RAG.
+- `structured_memory` is not earning its complexity yet. It compresses, but fact coverage lags: 3B `structured_memory - rag_topk` is about -0.12 at every haystack size, and 7B is -0.082/-0.071/-0.090 for h2/h8/h32.
+
+A13 Modal spend has not been read from the dashboard in this repo. The ledger records the operational spend checkpoints, and all Modal apps were stopped after the final run.
+
 ## Research Question
 
 Does the context-strategy frontier shift between `qwen2.5:3b` and `qwen2.5:7b`, what does streaming TTFT show once the client streams tokens, and is the prefix-cache abstention failure fixable with one explicit instruction?

@@ -2,7 +2,7 @@
 
 You are **codex-A**, working only in this repo. Read `../AGENTS.md` (conventions, quality bar, ledger protocol) and append to `../agent-ledger.md` after every milestone. codex-B consumes `exports/*.jsonl` per `../workload-schema.md` — existing export files must not change; v2 adds NEW files with new `dataset_id`s.
 
-## Status: v0+v1 COMPLETE — current phase: v2 A13d Modal sweep in progress
+## Status: v0+v1 COMPLETE — current phase: v2 A15 writeup/review packet
 
 v0 (40 tasks, 3b matrix, frontier) and v1 (streaming TTFT, 7b cross-scale matrix, abstention experiment) are done; see `RESULTS.md` and ledger. v2 exists because the v1 outcomes are softer than they should be, for three diagnosed reasons:
 
@@ -12,7 +12,7 @@ v0 (40 tasks, 3b matrix, frontier) and v1 (streaming TTFT, 7b cross-scale matrix
 
 A11 paired reanalysis and A12 judge calibration are complete. A13a/A13b/A13c are complete: the v2 h{2,8,32} haystack datasets exist, the abstention suite is expanded to 20 tasks, and the mock matrix proved the four-strategy path before GPU spend. A13d started on Modal, then stopped when the Modal workspace billing-cycle cap reclaimed the endpoint and returned 429s. The interrupted traces are diagnostic only and are archived under `results/v2-matrix-interrupted-modal-cap-20260624/`.
 
-After the cap was cleared, A13d resumed on Modal L4. The clean final matrix under `results/v2-matrix/` currently has 3B `full_context` and 3B `rag_topk` complete: each condition has 540 traces, all nine v2 datasets, and zero request errors. A paused 18-row 3B `summary_memory` partial is quarantined under `results/v2-matrix-paused-20260703/` and is not final evidence. Resume by redeploying `cbl-vllm-3b`, verifying `/v1/models`, and rerunning 3B `summary_memory` from scratch.
+After the cap was cleared, A13d resumed on Modal L4 and completed a clean final matrix under `results/v2-matrix/`: 2 models x 4 strategies x all nine v2 h{2,8,32} datasets x 3 repeats. Every final condition has 540 traces and zero request errors. A13e analysis is committed under `analysis/v2_sweep/` and reports the matrix clean before hypothesis summaries. Interrupted/errored diagnostics remain outside final evidence under `results/v2-matrix-interrupted-modal-cap-20260624/`, `results/v2-matrix-paused-20260703/`, and `results/v2-matrix-interrupted-modal-transient-20260706/`.
 
 ## Spend authorization (first paid API use this summer)
 
@@ -56,26 +56,26 @@ codex-B released local Ollama on 2026-06-12. A13 should not use the local Ollama
 - Deliverables: judge-vs-literal agreement table per strategy×model; H2 verdict with paired deltas under judge scoring; ~20 sampled disagreements in `analysis/judge_disagreements.md` for human spot-check; a proposed alias list (paraphrases the judge credited) in `analysis/proposed_fact_aliases.md` — **propose only, do not edit datasets**; flag `DECISION NEEDED:` for approval.
 - Tests: judge-call mocked; parser + dedupe + agreement math tested without network.
 
-### A13 — Context-size sweep (Modal GPU, core v2 run) — A13a/A13b/A13c DONE; A13d IN PROGRESS
+### A13 — Context-size sweep (Modal GPU, core v2 run) — DONE
 
 - DONE: Haystack builder generated deterministic variants of {2, 8, 32} docs, with gold docs always included. Because the v0 lanes did not have enough unique same-lane distractors for true 32-doc haystacks, h32 draws non-answering distractors from the union of both lanes; report this cross-lane padding caveat in RESULTS.
 - DONE: Abstention expanded to 20 tasks in `synthetic_agent_memory_abstain_v2` and swept across h{2,8,32}.
 - DONE: A mock matrix over the v2 datasets proved the four-strategy path before GPU spend.
-- IN PROGRESS: archive/keep the interrupted Modal cap traces as diagnostic only. Final evidence must be a fresh clean matrix: strategies {`full_context`, `rag_topk`, `summary_memory`, `structured_memory`} × sizes {2, 8, 32} × datasets {policy, memory, abstain} × models {`qwen2.5-3b-instruct`, `qwen2.5-7b-instruct`} × repeats 3. Current clean cells: 3B `full_context`, 3B `rag_topk`. Next clean cell: 3B `summary_memory` from scratch.
-- Run one model/strategy condition at a time, write summaries immediately, verify expected record count (540) and zero request errors before moving on, and stop all Modal apps at the end of each model block.
+- DONE: interrupted Modal cap traces are diagnostic only. Final evidence is a fresh clean matrix: strategies {`full_context`, `rag_topk`, `summary_memory`, `structured_memory`} × sizes {2, 8, 32} × datasets {policy, memory, abstain} × models {`qwen2.5-3b-instruct`, `qwen2.5-7b-instruct`} × repeats 3. All eight final model/strategy cells have 540 traces and zero request errors.
+- DONE: ran one model/strategy condition at a time, wrote summaries immediately, verified expected record count (540) and zero request errors before moving on, and stopped all Modal apps after each model block. One 7B `structured_memory` attempt hit transient connection reset/timeout errors and is archived under `results/v2-matrix-interrupted-modal-transient-20260706/`; the clean rerun is the only `structured_memory` run under final `results/v2-matrix/`.
 - **Alias list REJECTED (2026-06-14, see decisions.md): run A13 on the v1 deterministic scorer.** Do not wire `proposed_fact_aliases.md` into `scoring.py`. Report judge fact-coverage as a separate column beside the literal column where relevant; the literal/judge gap is the calibration finding, not a scorer patch. If the morphology fix below lands first, use that scorer version and label it.
 - Optional separate milestone (not the alias table): fix the literal matcher's morphology/word-order brittleness (`benchmark` not matching `benchmarks`, `responsible use guidance` vs `guidance on responsible use`) as a *general* normalization rule applied to all tasks, with gold **and negative** tests, then re-run and report literal-v2 vs literal-v1 vs judge. Reproducible; the curated per-answer alias list is not.
-- Analysis: run `uv run python analysis/v2_sweep.py results/v2-matrix --out-dir analysis/v2_sweep --resamples 1000 --seed 1729` after the clean matrix exists. The report must show completeness first, paired H1/H3 deltas by haystack size, and the Pareto frontier/crossing table. Do not write v2 claims from incomplete or errored cells.
+- DONE: `uv run python analysis/v2_sweep.py results/v2-matrix --out-dir analysis/v2_sweep --resamples 1000 --seed 1729` reports `Clean matrix: True`, completeness first, paired H1/H3 deltas by haystack size, and the Pareto frontier table. V2 claims should cite `analysis/v2_sweep/summary.md` and not the archived interrupted/errored cells.
 
 ### A14 — Optional API-subject anchor (~$2–4, within the same $10 cap)
 
 - Run `claude-haiku-4-5-20251001` as a *subject* on the 32-doc config, 4 strategies, repeats 1. Question: do the local-model strategy rankings hold for a production-grade small model? One table in RESULTS; no sweeping claims from one config.
 
-### A15 — RESULTS v2 + additive exports
+### A15 — RESULTS v2 + additive exports — IN PROGRESS
 
-- Rewrite `RESULTS.md` around the hypotheses: each H supported/refuted/inconclusive with its evidence path; updated limitations (what the judge did and did not fix); actual dollar spend.
-- Export the h32 suites as NEW files (`exports/public_ai_policy_v2_h32.jsonl`, etc.) — additive long-context gate workloads for codex-B (their research question 3 names long context). Existing export files byte-identical; extend the export test to cover the new files. Ledger-flag `exports: v2 long-context suites available` (additive — not a CONTRACT CHANGE).
-- README status update; research-log append with spend.
+- DONE: h32 suites are exported as NEW files (`exports/public_ai_policy_v2_h32.jsonl`, etc.) and existing v0 export files stayed byte-identical.
+- DONE: README status update and research-log append.
+- IN PROGRESS: `RESULTS.md` now has a v2 A13 section with H1/H2/H3 verdicts, frontier summary, limitations, and spend caveat. Final polish can decide whether to keep the historical v1 sections below it or split them into an appendix.
 
 ## Boundaries
 

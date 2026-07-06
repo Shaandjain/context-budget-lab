@@ -6,7 +6,7 @@ Benchmark suite answering: when should an agent use full context, retrieval, str
 
 **Second job (added 2026-06-11):** every task here doubles as a release-gate workload for `../inference-release-lab`. Task records must stay importable as gate suites: each carries `task_id`, `dataset_id`, expected source/citation IDs, expected facts, an output schema name, difficulty, and tags. Window compressed to weeks 3–5 (see `../ROADMAP.md`); v0 = 40 real tasks, deterministic judging, repeated runs with variance, one frontier chart.
 
-**Status:** v2 confidence phase in progress — v1 streaming/cross-scale packet complete; A11 paired reanalysis, A12 Anthropic judge calibration, and A13 dataset expansion are complete. A13 Modal sweep is back underway after the prior billing-cap interruption: 3B `full_context` and `rag_topk` are clean under `results/v2-matrix/`; resume with 3B `summary_memory` from scratch.
+**Status:** v2 confidence phase has a clean Modal A13 matrix and A13e analysis packet. V1 streaming/cross-scale packet, A11 paired reanalysis, A12 Anthropic judge calibration, A13 dataset expansion, and the Modal v2 sweep are complete. Final v2 evidence lives under `results/v2-matrix/`; diagnostic interrupted runs are archived outside that tree.
 
 Measures answer + citation accuracy alongside TTFT, TPOT/TBT, p50/p95, throughput, context tokens, cache hit rate, and cost per 1K useful answers. Datasets: public legal/policy docs, agent task logs, synthetic geo-audio transcripts (all public or synthetic, labeled).
 
@@ -71,11 +71,11 @@ hypothesis packet:
 uv run python analysis/v2_sweep.py results/v2-matrix --out-dir analysis/v2_sweep --resamples 1000 --seed 1729
 ```
 
-Current A13d Modal checkpoint:
+Current A13d/A13e Modal checkpoint:
 
-- `results/v2-matrix/qwen2-5-3b-instruct/full_context/context-budget-20260703-022226`: 540 traces, zero request errors.
-- `results/v2-matrix/qwen2-5-3b-instruct/rag_topk/context-budget-20260703-030945`: 540 traces, zero request errors.
-- `results/v2-matrix-paused-20260703/`: interrupted 18-row `summary_memory` partial, excluded from final evidence.
+- `results/v2-matrix/`: eight final model/strategy conditions, each with 540 traces and zero request errors.
+- `analysis/v2_sweep/summary.md`: clean-matrix completeness table, paired H1/H3 deltas by haystack size, and frontier table.
+- `results/v2-matrix-interrupted-modal-cap-20260624/`, `results/v2-matrix-paused-20260703/`, and `results/v2-matrix-interrupted-modal-transient-20260706/`: diagnostic interrupted/errored evidence, excluded from final v2 analysis.
 
 Export workload files for `../inference-release-lab`:
 

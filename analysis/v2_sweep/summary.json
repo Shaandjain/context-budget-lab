@@ -1,0 +1,620 @@
+{
+  "clean": true,
+  "completeness": [
+    {
+      "complete": true,
+      "errors": 0,
+      "expected_records": 540,
+      "model": "qwen2.5-3b-instruct",
+      "observed_records": 540,
+      "run_dir": "results/v2-matrix/qwen2-5-3b-instruct/full_context/context-budget-20260703-022226",
+      "strategy": "full_context"
+    },
+    {
+      "complete": true,
+      "errors": 0,
+      "expected_records": 540,
+      "model": "qwen2.5-3b-instruct",
+      "observed_records": 540,
+      "run_dir": "results/v2-matrix/qwen2-5-3b-instruct/rag_topk/context-budget-20260703-030945",
+      "strategy": "rag_topk"
+    },
+    {
+      "complete": true,
+      "errors": 0,
+      "expected_records": 540,
+      "model": "qwen2.5-3b-instruct",
+      "observed_records": 540,
+      "run_dir": "results/v2-matrix/qwen2-5-3b-instruct/structured_memory/context-budget-20260706-175353",
+      "strategy": "structured_memory"
+    },
+    {
+      "complete": true,
+      "errors": 0,
+      "expected_records": 540,
+      "model": "qwen2.5-3b-instruct",
+      "observed_records": 540,
+      "run_dir": "results/v2-matrix/qwen2-5-3b-instruct/summary_memory/context-budget-20260706-172537",
+      "strategy": "summary_memory"
+    },
+    {
+      "complete": true,
+      "errors": 0,
+      "expected_records": 540,
+      "model": "qwen2.5-7b-instruct",
+      "observed_records": 540,
+      "run_dir": "results/v2-matrix/qwen2-5-7b-instruct/full_context/context-budget-20260706-182714",
+      "strategy": "full_context"
+    },
+    {
+      "complete": true,
+      "errors": 0,
+      "expected_records": 540,
+      "model": "qwen2.5-7b-instruct",
+      "observed_records": 540,
+      "run_dir": "results/v2-matrix/qwen2-5-7b-instruct/rag_topk/context-budget-20260706-191451",
+      "strategy": "rag_topk"
+    },
+    {
+      "complete": true,
+      "errors": 0,
+      "expected_records": 540,
+      "model": "qwen2.5-7b-instruct",
+      "observed_records": 540,
+      "run_dir": "results/v2-matrix/qwen2-5-7b-instruct/structured_memory/context-budget-20260706-223401",
+      "strategy": "structured_memory"
+    },
+    {
+      "complete": true,
+      "errors": 0,
+      "expected_records": 540,
+      "model": "qwen2.5-7b-instruct",
+      "observed_records": 540,
+      "run_dir": "results/v2-matrix/qwen2-5-7b-instruct/summary_memory/context-budget-20260706-200602",
+      "strategy": "summary_memory"
+    }
+  ],
+  "frontier": [
+    {
+      "fact_coverage": 0.556019,
+      "haystack_size": 2,
+      "input_tokens_mean": 244.683333,
+      "latency_p50_s": 4.662717,
+      "model": "qwen2.5-3b-instruct",
+      "pareto_optimal": false,
+      "strategy": "full_context"
+    },
+    {
+      "fact_coverage": 0.614167,
+      "haystack_size": 2,
+      "input_tokens_mean": 246.333333,
+      "latency_p50_s": 4.212962,
+      "model": "qwen2.5-3b-instruct",
+      "pareto_optimal": true,
+      "strategy": "rag_topk"
+    },
+    {
+      "fact_coverage": 0.493148,
+      "haystack_size": 2,
+      "input_tokens_mean": 207.816667,
+      "latency_p50_s": 2.817634,
+      "model": "qwen2.5-3b-instruct",
+      "pareto_optimal": false,
+      "strategy": "structured_memory"
+    },
+    {
+      "fact_coverage": 0.584352,
+      "haystack_size": 2,
+      "input_tokens_mean": 195.466667,
+      "latency_p50_s": 2.640004,
+      "model": "qwen2.5-3b-instruct",
+      "pareto_optimal": true,
+      "strategy": "summary_memory"
+    },
+    {
+      "fact_coverage": 0.544259,
+      "haystack_size": 8,
+      "input_tokens_mean": 607.383333,
+      "latency_p50_s": 4.696148,
+      "model": "qwen2.5-3b-instruct",
+      "pareto_optimal": false,
+      "strategy": "full_context"
+    },
+    {
+      "fact_coverage": 0.583333,
+      "haystack_size": 8,
+      "input_tokens_mean": 305.533333,
+      "latency_p50_s": 4.497858,
+      "model": "qwen2.5-3b-instruct",
+      "pareto_optimal": true,
+      "strategy": "rag_topk"
+    },
+    {
+      "fact_coverage": 0.47213,
+      "haystack_size": 8,
+      "input_tokens_mean": 474.066667,
+      "latency_p50_s": 3.264343,
+      "model": "qwen2.5-3b-instruct",
+      "pareto_optimal": false,
+      "strategy": "structured_memory"
+    },
+    {
+      "fact_coverage": 0.614259,
+      "haystack_size": 8,
+      "input_tokens_mean": 428.783333,
+      "latency_p50_s": 3.117424,
+      "model": "qwen2.5-3b-instruct",
+      "pareto_optimal": true,
+      "strategy": "summary_memory"
+    },
+    {
+      "fact_coverage": 0.562685,
+      "haystack_size": 32,
+      "input_tokens_mean": 2145.033333,
+      "latency_p50_s": 5.088082,
+      "model": "qwen2.5-3b-instruct",
+      "pareto_optimal": false,
+      "strategy": "full_context"
+    },
+    {
+      "fact_coverage": 0.591296,
+      "haystack_size": 32,
+      "input_tokens_mean": 312.383333,
+      "latency_p50_s": 4.434842,
+      "model": "qwen2.5-3b-instruct",
+      "pareto_optimal": true,
+      "strategy": "rag_topk"
+    },
+    {
+      "fact_coverage": 0.470926,
+      "haystack_size": 32,
+      "input_tokens_mean": 1568.9,
+      "latency_p50_s": 3.152186,
+      "model": "qwen2.5-3b-instruct",
+      "pareto_optimal": false,
+      "strategy": "structured_memory"
+    },
+    {
+      "fact_coverage": 0.567778,
+      "haystack_size": 32,
+      "input_tokens_mean": 1391.716667,
+      "latency_p50_s": 2.737467,
+      "model": "qwen2.5-3b-instruct",
+      "pareto_optimal": true,
+      "strategy": "summary_memory"
+    },
+    {
+      "fact_coverage": 0.572685,
+      "haystack_size": 2,
+      "input_tokens_mean": 244.683333,
+      "latency_p50_s": 4.509679,
+      "model": "qwen2.5-7b-instruct",
+      "pareto_optimal": true,
+      "strategy": "full_context"
+    },
+    {
+      "fact_coverage": 0.566852,
+      "haystack_size": 2,
+      "input_tokens_mean": 246.333333,
+      "latency_p50_s": 4.894683,
+      "model": "qwen2.5-7b-instruct",
+      "pareto_optimal": false,
+      "strategy": "rag_topk"
+    },
+    {
+      "fact_coverage": 0.484907,
+      "haystack_size": 2,
+      "input_tokens_mean": 207.816667,
+      "latency_p50_s": 4.823755,
+      "model": "qwen2.5-7b-instruct",
+      "pareto_optimal": true,
+      "strategy": "structured_memory"
+    },
+    {
+      "fact_coverage": 0.606111,
+      "haystack_size": 2,
+      "input_tokens_mean": 195.466667,
+      "latency_p50_s": 5.026965,
+      "model": "qwen2.5-7b-instruct",
+      "pareto_optimal": true,
+      "strategy": "summary_memory"
+    },
+    {
+      "fact_coverage": 0.585648,
+      "haystack_size": 8,
+      "input_tokens_mean": 607.383333,
+      "latency_p50_s": 4.528709,
+      "model": "qwen2.5-7b-instruct",
+      "pareto_optimal": true,
+      "strategy": "full_context"
+    },
+    {
+      "fact_coverage": 0.571759,
+      "haystack_size": 8,
+      "input_tokens_mean": 305.533333,
+      "latency_p50_s": 4.785613,
+      "model": "qwen2.5-7b-instruct",
+      "pareto_optimal": true,
+      "strategy": "rag_topk"
+    },
+    {
+      "fact_coverage": 0.500463,
+      "haystack_size": 8,
+      "input_tokens_mean": 474.066667,
+      "latency_p50_s": 4.568983,
+      "model": "qwen2.5-7b-instruct",
+      "pareto_optimal": true,
+      "strategy": "structured_memory"
+    },
+    {
+      "fact_coverage": 0.620463,
+      "haystack_size": 8,
+      "input_tokens_mean": 428.783333,
+      "latency_p50_s": 5.048991,
+      "model": "qwen2.5-7b-instruct",
+      "pareto_optimal": true,
+      "strategy": "summary_memory"
+    },
+    {
+      "fact_coverage": 0.577685,
+      "haystack_size": 32,
+      "input_tokens_mean": 2145.033333,
+      "latency_p50_s": 4.6552,
+      "model": "qwen2.5-7b-instruct",
+      "pareto_optimal": true,
+      "strategy": "full_context"
+    },
+    {
+      "fact_coverage": 0.588519,
+      "haystack_size": 32,
+      "input_tokens_mean": 312.383333,
+      "latency_p50_s": 5.16767,
+      "model": "qwen2.5-7b-instruct",
+      "pareto_optimal": true,
+      "strategy": "rag_topk"
+    },
+    {
+      "fact_coverage": 0.498704,
+      "haystack_size": 32,
+      "input_tokens_mean": 1568.9,
+      "latency_p50_s": 5.052839,
+      "model": "qwen2.5-7b-instruct",
+      "pareto_optimal": true,
+      "strategy": "structured_memory"
+    },
+    {
+      "fact_coverage": 0.605648,
+      "haystack_size": 32,
+      "input_tokens_mean": 1391.716667,
+      "latency_p50_s": 5.224144,
+      "model": "qwen2.5-7b-instruct",
+      "pareto_optimal": true,
+      "strategy": "summary_memory"
+    }
+  ],
+  "h1": {
+    "rows": [
+      {
+        "baseline_strategy": "full_context",
+        "comparison_strategy": "rag_topk",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 2,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-3b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": 0.109444,
+          "ci_low": 0.015556,
+          "n": 60,
+          "value": 0.058148
+        }
+      },
+      {
+        "baseline_strategy": "full_context",
+        "comparison_strategy": "rag_topk",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 8,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-3b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": 0.096759,
+          "ci_low": -0.010185,
+          "n": 60,
+          "value": 0.039074
+        }
+      },
+      {
+        "baseline_strategy": "full_context",
+        "comparison_strategy": "rag_topk",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 32,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-3b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": 0.088241,
+          "ci_low": -0.025833,
+          "n": 60,
+          "value": 0.028611
+        }
+      },
+      {
+        "baseline_strategy": "full_context",
+        "comparison_strategy": "rag_topk",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 2,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-7b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": 0.014259,
+          "ci_low": -0.028611,
+          "n": 60,
+          "value": -0.005833
+        }
+      },
+      {
+        "baseline_strategy": "full_context",
+        "comparison_strategy": "rag_topk",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 8,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-7b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": 0.034352,
+          "ci_low": -0.066204,
+          "n": 60,
+          "value": -0.013889
+        }
+      },
+      {
+        "baseline_strategy": "full_context",
+        "comparison_strategy": "rag_topk",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 32,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-7b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": 0.060556,
+          "ci_low": -0.035278,
+          "n": 60,
+          "value": 0.010833
+        }
+      }
+    ],
+    "verdicts": [
+      {
+        "hypothesis": "H1",
+        "model": "qwen2.5-3b-instruct",
+        "rationale": "h32 does not show a positive paired advantage with a CI excluding zero",
+        "verdict": "inconclusive"
+      },
+      {
+        "hypothesis": "H1",
+        "model": "qwen2.5-7b-instruct",
+        "rationale": "h32 does not show a positive paired advantage with a CI excluding zero",
+        "verdict": "inconclusive"
+      }
+    ]
+  },
+  "h3": {
+    "rows": [
+      {
+        "baseline_strategy": "rag_topk",
+        "comparison_strategy": "summary_memory",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 2,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-3b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": 0.053519,
+          "ci_low": -0.120833,
+          "n": 60,
+          "value": -0.029815
+        }
+      },
+      {
+        "baseline_strategy": "rag_topk",
+        "comparison_strategy": "summary_memory",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 8,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-3b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": 0.116481,
+          "ci_low": -0.056019,
+          "n": 60,
+          "value": 0.030926
+        }
+      },
+      {
+        "baseline_strategy": "rag_topk",
+        "comparison_strategy": "summary_memory",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 32,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-3b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": 0.06713,
+          "ci_low": -0.120926,
+          "n": 60,
+          "value": -0.023519
+        }
+      },
+      {
+        "baseline_strategy": "rag_topk",
+        "comparison_strategy": "structured_memory",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 2,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-3b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": -0.059444,
+          "ci_low": -0.188333,
+          "n": 60,
+          "value": -0.121019
+        }
+      },
+      {
+        "baseline_strategy": "rag_topk",
+        "comparison_strategy": "structured_memory",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 8,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-3b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": -0.043981,
+          "ci_low": -0.182593,
+          "n": 60,
+          "value": -0.111204
+        }
+      },
+      {
+        "baseline_strategy": "rag_topk",
+        "comparison_strategy": "structured_memory",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 32,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-3b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": -0.054167,
+          "ci_low": -0.192315,
+          "n": 60,
+          "value": -0.12037
+        }
+      },
+      {
+        "baseline_strategy": "rag_topk",
+        "comparison_strategy": "summary_memory",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 2,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-7b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": 0.114259,
+          "ci_low": -0.041944,
+          "n": 60,
+          "value": 0.039259
+        }
+      },
+      {
+        "baseline_strategy": "rag_topk",
+        "comparison_strategy": "summary_memory",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 8,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-7b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": 0.123519,
+          "ci_low": -0.027593,
+          "n": 60,
+          "value": 0.048704
+        }
+      },
+      {
+        "baseline_strategy": "rag_topk",
+        "comparison_strategy": "summary_memory",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 32,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-7b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": 0.097963,
+          "ci_low": -0.073056,
+          "n": 60,
+          "value": 0.01713
+        }
+      },
+      {
+        "baseline_strategy": "rag_topk",
+        "comparison_strategy": "structured_memory",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 2,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-7b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": -0.023611,
+          "ci_low": -0.148611,
+          "n": 60,
+          "value": -0.081944
+        }
+      },
+      {
+        "baseline_strategy": "rag_topk",
+        "comparison_strategy": "structured_memory",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 8,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-7b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": -0.009074,
+          "ci_low": -0.137407,
+          "n": 60,
+          "value": -0.071296
+        }
+      },
+      {
+        "baseline_strategy": "rag_topk",
+        "comparison_strategy": "structured_memory",
+        "delta": "comparison_minus_baseline",
+        "haystack_size": 32,
+        "metric": "fact_coverage",
+        "model": "qwen2.5-7b-instruct",
+        "n_tasks": 60,
+        "paired_delta": {
+          "ci_high": -0.033148,
+          "ci_low": -0.151574,
+          "n": 60,
+          "value": -0.089815
+        }
+      }
+    ],
+    "verdicts": [
+      {
+        "hypothesis": "H3",
+        "model": "qwen2.5-3b-instruct",
+        "rationale": "structured_memory does not show a clear h32 degradation relative to rag_topk",
+        "strategy": "structured_memory",
+        "verdict": "inconclusive"
+      },
+      {
+        "hypothesis": "H3",
+        "model": "qwen2.5-3b-instruct",
+        "rationale": "summary_memory does not show a clear h32 degradation relative to rag_topk",
+        "strategy": "summary_memory",
+        "verdict": "inconclusive"
+      },
+      {
+        "hypothesis": "H3",
+        "model": "qwen2.5-7b-instruct",
+        "rationale": "structured_memory is farther below rag_topk at h32 than h2, with h32 CI below zero",
+        "strategy": "structured_memory",
+        "verdict": "supported"
+      },
+      {
+        "hypothesis": "H3",
+        "model": "qwen2.5-7b-instruct",
+        "rationale": "summary_memory does not show a clear h32 degradation relative to rag_topk",
+        "strategy": "summary_memory",
+        "verdict": "inconclusive"
+      }
+    ]
+  },
+  "resamples": 1000,
+  "results_root": "results/v2-matrix",
+  "seed": 1729
+}

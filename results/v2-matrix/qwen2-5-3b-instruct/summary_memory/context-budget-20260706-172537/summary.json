@@ -1,0 +1,18 @@
+[
+  {
+    "avg_abstain_correct": 0.862,
+    "avg_citation_precision": 0.436,
+    "avg_citation_recall": 0.699,
+    "avg_evidence_recall": 1.0,
+    "avg_fact_coverage": 0.589,
+    "avg_input_tokens": 671.99,
+    "avg_latency_s": 3.0786,
+    "avg_output_tokens": 105.72,
+    "avg_schema_ok": 0.724,
+    "cost_per_useful_answer_usd": null,
+    "errors": 0,
+    "n": 540,
+    "strategy": "summary_memory",
+    "useful_answers": 92
+  }
+]

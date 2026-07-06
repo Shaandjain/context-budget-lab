@@ -1,0 +1,37 @@
+{
+  "config": {
+    "base_url": "https://shaandjain--cbl-vllm-7b-serve.modal.run/v1",
+    "datasets": [
+      "public_ai_policy_v2_h2",
+      "public_ai_policy_v2_h8",
+      "public_ai_policy_v2_h32",
+      "synthetic_agent_memory_v2_h2",
+      "synthetic_agent_memory_v2_h8",
+      "synthetic_agent_memory_v2_h32",
+      "synthetic_agent_memory_abstain_v2_h2",
+      "synthetic_agent_memory_abstain_v2_h8",
+      "synthetic_agent_memory_abstain_v2_h32"
+    ],
+    "limit": null,
+    "max_tokens": 180,
+    "mock": false,
+    "model": "qwen2.5-7b-instruct",
+    "repeats": 3,
+    "seed": 1729,
+    "strategies": [
+      "full_context"
+    ],
+    "temperature": 0.0
+  },
+  "created_at": "2026-07-06T19:12:35.920590+00:00",
+  "environment": {
+    "machine": "m3-pro-local",
+    "notes": "local-first Project 2 smoke"
+  },
+  "git_commit": "80890c5664e21365ecb34b48b67ed649fa0e40cf",
+  "n_requests": 540,
+  "repo": "context-budget-lab",
+  "run_id": "context-budget-20260706-182714",
+  "schema_version": "0.1",
+  "source": "live"
+}
