@@ -18,9 +18,9 @@ Reproduce the A13 v2 Modal analysis:
 uv run python analysis/v2_sweep.py results/v2-matrix --out-dir analysis/v2_sweep --resamples 1000 --seed 1729
 ```
 
-## Latest: A13 v2 Modal Sweep
+## Latest: A13/A15 v2 Modal Sweep Closeout
 
-A13 is the first version of this lab that actually stresses the context budget. It runs both `qwen2.5-3b-instruct` and `qwen2.5-7b-instruct` on Modal L4 over nine v2 datasets: policy, memory, and abstention tasks at h2, h8, and h32 haystack sizes. Each final model/strategy condition has 540 traces and zero request errors. The analyzer reports `Clean matrix: True` in `analysis/v2_sweep/summary.md`.
+A15 closes Project 2 on the committed A13 evidence packet, not another run phase. A13 is the first version of this lab that actually stresses the context budget. It runs both `qwen2.5-3b-instruct` and `qwen2.5-7b-instruct` on Modal L4 over nine v2 datasets: policy, memory, and abstention tasks at h2, h8, and h32 haystack sizes. Each final model/strategy condition has 540 traces and zero request errors. The analyzer reports `Clean matrix: True` in `analysis/v2_sweep/summary.md`.
 
 One 7B `structured_memory` attempt hit transient connection reset/read-timeout errors on a single h32 memory case and is archived under `results/v2-matrix-interrupted-modal-transient-20260706/`. It is not part of final analysis; the clean rerun is `results/v2-matrix/qwen2-5-7b-instruct/structured_memory/context-budget-20260706-223401`.
 
@@ -54,6 +54,8 @@ The clearest product-shaped result is that strategy choice is model-sensitive:
 - `structured_memory` is not earning its complexity yet. It compresses, but fact coverage lags: 3B `structured_memory - rag_topk` is about -0.12 at every haystack size, and 7B is -0.082/-0.071/-0.090 for h2/h8/h32.
 
 A13 Modal spend has not been read from the dashboard in this repo. The ledger records the operational spend checkpoints, and all Modal apps were stopped after the final run.
+
+The sections below are historical context for the A15 packet. They explain the v1 frontier, the A11 paired reanalysis, and the A12 judge calibration that motivated the v2 run; they are not newer evidence than the A13/A15 closeout above.
 
 ## Research Question
 
@@ -143,7 +145,16 @@ The deterministic scorer is literal. A12 shows that it misses valid paraphrases,
 
 The workload exports remain producer-side task suites for `../inference-release-lab`; no record-format or schema change was made in v1.
 
-## Review Packet
+## A15 Review Packet
+
+- V2 clean-matrix analysis: `analysis/v2_sweep/summary.md`
+- V2 analysis JSON: `analysis/v2_sweep/summary.json`
+- Final v2 raw traces: `results/v2-matrix/**/traces.jsonl`
+- Diagnostic excluded runs: `results/v2-matrix-interrupted-modal-cap-20260624/`, `results/v2-matrix-paused-20260703/`, `results/v2-matrix-interrupted-modal-transient-20260706/`
+- Additive h32 workload exports: `exports/public_ai_policy_v2_h32.jsonl`, `exports/synthetic_agent_memory_v2_h32.jsonl`, `exports/synthetic_agent_memory_abstain_v2_h32.jsonl`
+- V0 workload exports: `exports/public_ai_policy_v0.jsonl`, `exports/synthetic_agent_memory_v0.jsonl`
+
+Historical support files:
 
 - Cross-scale frontier: `analysis/frontier/frontier.svg`
 - Cross-scale summary: `analysis/frontier/summary.md`

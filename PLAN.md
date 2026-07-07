@@ -2,7 +2,7 @@
 
 You are **codex-A**, working only in this repo. Read `../AGENTS.md` (conventions, quality bar, ledger protocol) and append to `../agent-ledger.md` after every milestone. codex-B consumes `exports/*.jsonl` per `../workload-schema.md` — existing export files must not change; v2 adds NEW files with new `dataset_id`s.
 
-## Status: v0+v1 COMPLETE — current phase: v2 A15 writeup/review packet
+## Status: v0+v1 COMPLETE — v2 A15 review packet COMPLETE
 
 v0 (40 tasks, 3b matrix, frontier) and v1 (streaming TTFT, 7b cross-scale matrix, abstention experiment) are done; see `RESULTS.md` and ledger. v2 exists because the v1 outcomes are softer than they should be, for three diagnosed reasons:
 
@@ -12,7 +12,7 @@ v0 (40 tasks, 3b matrix, frontier) and v1 (streaming TTFT, 7b cross-scale matrix
 
 A11 paired reanalysis and A12 judge calibration are complete. A13a/A13b/A13c are complete: the v2 h{2,8,32} haystack datasets exist, the abstention suite is expanded to 20 tasks, and the mock matrix proved the four-strategy path before GPU spend. A13d started on Modal, then stopped when the Modal workspace billing-cycle cap reclaimed the endpoint and returned 429s. The interrupted traces are diagnostic only and are archived under `results/v2-matrix-interrupted-modal-cap-20260624/`.
 
-After the cap was cleared, A13d resumed on Modal L4 and completed a clean final matrix under `results/v2-matrix/`: 2 models x 4 strategies x all nine v2 h{2,8,32} datasets x 3 repeats. Every final condition has 540 traces and zero request errors. A13e analysis is committed under `analysis/v2_sweep/` and reports the matrix clean before hypothesis summaries. Interrupted/errored diagnostics remain outside final evidence under `results/v2-matrix-interrupted-modal-cap-20260624/`, `results/v2-matrix-paused-20260703/`, and `results/v2-matrix-interrupted-modal-transient-20260706/`.
+After the cap was cleared, A13d resumed on Modal L4 and completed a clean final matrix under `results/v2-matrix/`: 2 models x 4 strategies x all nine v2 h{2,8,32} datasets x 3 repeats. Every final condition has 540 traces and zero request errors. A13e analysis is committed under `analysis/v2_sweep/` and reports the matrix clean before hypothesis summaries. Interrupted/errored diagnostics remain outside final evidence under `results/v2-matrix-interrupted-modal-cap-20260624/`, `results/v2-matrix-paused-20260703/`, and `results/v2-matrix-interrupted-modal-transient-20260706/`. A15 closes Project 2 with the review packet in `RESULTS.md`, additive h32 exports for release-lab, and green local verification.
 
 ## Spend authorization (first paid API use this summer)
 
@@ -67,15 +67,15 @@ codex-B released local Ollama on 2026-06-12. A13 should not use the local Ollama
 - Optional separate milestone (not the alias table): fix the literal matcher's morphology/word-order brittleness (`benchmark` not matching `benchmarks`, `responsible use guidance` vs `guidance on responsible use`) as a *general* normalization rule applied to all tasks, with gold **and negative** tests, then re-run and report literal-v2 vs literal-v1 vs judge. Reproducible; the curated per-answer alias list is not.
 - DONE: `uv run python analysis/v2_sweep.py results/v2-matrix --out-dir analysis/v2_sweep --resamples 1000 --seed 1729` reports `Clean matrix: True`, completeness first, paired H1/H3 deltas by haystack size, and the Pareto frontier table. V2 claims should cite `analysis/v2_sweep/summary.md` and not the archived interrupted/errored cells.
 
-### A14 — Optional API-subject anchor (~$2–4, within the same $10 cap)
+### A14 — Optional API-subject anchor (~$2–4, within the same $10 cap) — SKIPPED FOR CLOSEOUT
 
-- Run `claude-haiku-4-5-20251001` as a *subject* on the 32-doc config, 4 strategies, repeats 1. Question: do the local-model strategy rankings hold for a production-grade small model? One table in RESULTS; no sweeping claims from one config.
+- Skipped for A15 closeout. Do not run the optional Anthropic subject-model anchor unless the human explicitly reopens it later. Project 2 closes on the committed local/Modal evidence packet.
 
-### A15 — RESULTS v2 + additive exports — IN PROGRESS
+### A15 — RESULTS v2 + additive exports — DONE
 
 - DONE: h32 suites are exported as NEW files (`exports/public_ai_policy_v2_h32.jsonl`, etc.) and existing v0 export files stayed byte-identical.
 - DONE: README status update and research-log append.
-- IN PROGRESS: `RESULTS.md` now has a v2 A13 section with H1/H2/H3 verdicts, frontier summary, limitations, and spend caveat. Final polish can decide whether to keep the historical v1 sections below it or split them into an appendix.
+- DONE: `RESULTS.md` has a v2 A13/A15 section with H1/H2/H3 verdicts, frontier summary, limitations, review packet pointers, and spend caveat. Historical v1/A11/A12 sections remain below it as context, not the current headline.
 
 ## Boundaries
 
@@ -84,4 +84,4 @@ codex-B released local Ollama on 2026-06-12. A13 should not use the local Ollama
 
 ## Review packet
 
-Paired-comparison table + judge agreement/disagreement files + H1/H2/H3 verdicts + Pareto-crossing chart + spend ledger + green pytest. The question the packet answers: "which of the v1 maybe-findings are now real, and what did it cost to find out?"
+A15 packet: clean-matrix completeness table + H1/H2/H3 verdicts + frontier table + additive h32 exports + A11 paired table + A12 judge calibration/disagreement files + spend ledger + green pytest. The question the packet answers: "which of the v1 maybe-findings are now real, and what did it cost to find out?"
